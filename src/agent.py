@@ -16,7 +16,7 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from agents.sales_agent import DefaultAgent
 
-logger = logging.getLogger("agent-Dakota-1462")
+logger = logging.getLogger("IRONMAN")
 
 load_dotenv(".env")
 
@@ -27,7 +27,7 @@ def prewarm(proc: JobProcess):
 
 server.setup_fnc = prewarm
 
-@server.rtc_session(agent_name="Dakota-1462")
+@server.rtc_session(agent_name="IRONMAN")
 async def entrypoint(ctx: JobContext):
     # Wait for the SIP caller to join the room
     participant = await ctx.wait_for_participant()
@@ -43,9 +43,14 @@ async def entrypoint(ctx: JobContext):
             model="google/gemini-3.1-flash-lite",
             extra_kwargs={"reasoning_effort": "low"},
         ),
-        tts=inference.TTS(
-            model="cartesia/sonic-3",
-            voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc",
+        # tts=inference.TTS(
+        #     model="cartesia/sonic-3",
+        #     voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc",
+        #     language="en"
+        # ),
+        tts = inference.TTS(
+            model="elevenlabs/eleven_multilingual_v2",
+            voice="ecp3DWciuUyW7BYM7II1",
             language="en"
         ),
         turn_handling=TurnHandlingOptions(turn_detection=MultilingualModel()),

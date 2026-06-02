@@ -1,27 +1,33 @@
 from dataclasses import dataclass
 
 @dataclass
-class ContactIdentificationResults:
-    contact_name: str
-    work_email: str
-    company_name: str
-    role_title: str | None = None
+class CustomerInfoResults:
+    full_name: str
+    number_of_travelers: int | None = None
 
 @dataclass
-class CompanyDetailsResults:
-    company_website: str | None = None
-    company_size: str | None = None
+class TravelPlanResults:
+    source : str
+    destination: str
+    travel_dates: str | None = None
 
 @dataclass
-class UseCaseResults:
-    primary_use_case: str
-    current_solution: str | None = None
+class BudgetResults:
+    budget: str
 
 @dataclass
-class RequirementsAndConstraintsResults:
-    constraint: str
+class TravelPreferenceResults:
+    transportation_mode: str  # Flight, Train, Bus, etc.
 
 @dataclass
-class TimelineAndUrgencyResults:
-    urgency: str
-    target_date: str | None = None
+class AccommodationPreferenceResults:
+    accommodation_type: str  # 5-star, 4-star, villa, etc.
+
+@dataclass
+class ActivityPreferenceResults:
+    activities: str
+
+@dataclass
+class ContactInfoResults:
+    phone_number: str | None = None
+    email_address: str | None = None
