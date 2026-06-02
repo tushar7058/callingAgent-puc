@@ -38,9 +38,9 @@ class TravelPlanTask(AgentTask):
         await self.session.generate_reply(instructions="Begin this task now.", allow_interruptions=True, tool_choice="auto")
 
     @function_tool(name="record_travel_plan")
-    async def record_travel_plan(self, context: RunContext,source:str, destination: str, travel_dates: str | None = None):
-        """Call when you have collected the source ,  destination and dates."""
-        self.complete(TravelPlanResults(source=source, destination=destination, travel_dates=travel_dates ))
+    async def record_travel_plan(self, context: RunContext, source: str, destination: str, travel_dates: str | None = None):
+        """Call when you have collected the source, destination, and dates."""
+        self.complete(TravelPlanResults(source=source, destination=destination, travel_dates=travel_dates))
 
 class BudgetTask(AgentTask):
     def __init__(self, agent_instructions: str, extra_tools: list | None = None):

@@ -7,7 +7,7 @@ class CustomerInfoResults:
 
 @dataclass
 class TravelPlanResults:
-    source : str
+    source: str
     destination: str
     travel_dates: str | None = None
 

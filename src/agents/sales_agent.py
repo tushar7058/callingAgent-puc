@@ -84,7 +84,7 @@ You are interacting with a user via voice to plan their perfect trip.
         task_group.add(
             lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPlanTask(agent_instructions=_ai, extra_tools=_tools),
             id="travel_plan",
-            description="Find out the travel source and destination and preferred dates.",
+            description="Find out the travel source, destination, and preferred dates.",
         )
         # 3. Budget
         task_group.add(
