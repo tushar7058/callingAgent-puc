@@ -1,13 +1,16 @@
-from livekit.agents import AgentTask, function_tool, RunContext
+from livekit.agents import AgentTask, RunContext, function_tool, get_job_context
+
 from models.data_collection import (
-    CustomerInfoResults,
-    TravelPlanResults,
-    BudgetResults,
-    TravelPreferenceResults,
     AccommodationPreferenceResults,
     ActivityPreferenceResults,
-    ContactInfoResults
+    BudgetResults,
+    ContactInfoResults,
+    CustomerInfoResults,
+    LanguagePreferenceResults,
+    TravelPlanResults,
+    TravelPreferenceResults,
 )
+
 
 def _build_task_instructions(agent_instructions: str, task_instructions: str, is_first: bool = False):
     prefix = "" if is_first else "The user has already been greeted. Do not introduce yourself or say hello. Directly ask for the required information.\n"
@@ -27,6 +30,26 @@ class CustomerInfoTask(AgentTask):
     async def record_customer_info(self, context: RunContext, full_name: str, number_of_travelers: int | None = None):
         """Call when you have collected the customer's name and number of travelers."""
         self.complete(CustomerInfoResults(full_name=full_name, number_of_travelers=number_of_travelers))
+
+class LanguagePreferenceTask(AgentTask):
+    def __init__(self, agent_instructions: str, extra_tools: list | None = None):
+        super().__init__(
+            instructions=_build_task_instructions(
+                agent_instructions,
+                "- Ask which language the customer prefers for the conversation.\n- Offer only two options: English or Arabic.\n- IMPORTANT: Ask this question bilingually in both English and Arabic (e.g., 'Would you prefer to continue in English, or Arabic? هل تفضل الاستمرار باللغة الإنجليزية أم العربية؟').\n- Record the exact chosen option using the tool.",
+                is_first=False,
+            ),
+            tools=list(extra_tools) if extra_tools else [],
+        )
+
+    async def on_enter(self):
+        await self.session.generate_reply(instructions="Begin this task now.", allow_interruptions=True, tool_choice="auto")
+
+    @function_tool(name="record_language_preference")
+    async def record_language_preference(self, context: RunContext, preferred_language: str):
+        """Call when you have collected the customer's preferred language."""
+        get_job_context().proc.userdata["preferred_language"] = preferred_language
+        self.complete(LanguagePreferenceResults(preferred_language=preferred_language))
 
 class TravelPlanTask(AgentTask):
     def __init__(self, agent_instructions: str, extra_tools: list | None = None):

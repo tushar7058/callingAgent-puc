@@ -9,11 +9,14 @@ description = "Single prompt voice AI agent built with LiveKit Agents for Python
 requires-python = ">=3.10"
 
 dependencies = [
-    "livekit-agents[silero,turn-detector]~=1.5",
+    "elevenlabs>=2.51.0",
+    "google-generativeai>=0.8.6",
+    "livekit-agents[elevenlabs,google,openai,silero,turn-detector]~=1.5",
     "livekit-plugins-ai-coustics~=0.2",
+    "livekit-plugins-deepgram>=1.5.15",
     "livekit-plugins-noise-cancellation~=0.2",
     "python-dotenv",
-    "python-handlebars"
+    "python-handlebars",
 ]
 
 [dependency-groups]

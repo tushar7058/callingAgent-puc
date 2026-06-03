@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "hire-ups",
+  "private_key_id": "8d67d162a960b98777fa89f1b1a03df80b7199f1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC3C2b1L47CZAdp\naIRAhMO4QUtWLl6jANUlJwxVepiT7DR4OYf8mr36Fy0cNExTs5kLTqniQdbS0zAl\nPUFuEmK1MZfRZvlzzRzHle6AvSd57fSFjiMhdp91PsR8BUF/lSMaHRutz77HQcHF\nAPerkLFJeruZV+7Oc6l/Wr6iwRBRh7bRDgoJnKt8TkHXQ0L3MUNE05JBQ2B/qhIL\nr85w2/i1Ut403VFqXRa4rwJ/sUDoqFSL+larJW3EgfPTkF8ahU4t5ommvItTWffg\niUFNwNI39r83M28o7djBdLXF7L59pVuonL3YTcz/C91Rc/WIxXmMYpzVrPHOaq2T\n34uIRx0rAgMBAAECggEAS0rL42/YA5rct52PxPA3h5uIDx+MuvT1N86Lkr+WckY3\nQPq9Nok6Otx8qDzU5psaCV4moBRf9qF7DN5ZAxtZ8dk/7xkx49HLlEdWbysfSVa5\nfZQ9XB7ssXALp04MJpwkb7HoeELbYR/pwgzHU5F1c1miQA29A7vszR95Cf5rJXV+\n+c7jRmx/k67ubyHmz1dFjvInE2m4x8q+e3s231hUbe/4fTqk6jPecS8tWshZt0dV\nIVIWHEyfDUF5Y7NZFGuOOwQIKfJjdZMkKEyCQMmjQn6OaGOcNINtwgDArivcQOkk\ndzx3KeBY2MCU+JSDx4Is9g0De8cyKsqP0CaA82xtLQKBgQD747KvZw5sUYB/TpuB\nunj6A7iwUBIA3rfgH8PTcOVBvcTWRNVKXwgeAQCAz7JobBoMlex8B1vaZT6FBs0K\nJgpFj+WnoZp5SOxrQSYl+feQyNRD2hsMNpuwdpmHg3w+veqFM78jDoxwLTRMtk4z\n1u0FhN4iwxhvlZ9bp+YHRGXpzQKBgQC6CBhofffSw4QIgywzu7vczZL+Q79LvQDH\nZxkeTpjUlXZfEMJw6XNh6x9oxiOju48z/4n7iCGwkLh3JnpweR2urQPKthWVZBUw\nBMxFDAqqo5l2rXyzfn3gWlScHDYQPnmUVYJTbvW5SRWrXY3EgWPyUzHcwbdgFklp\noKo8GQTK1wKBgQDLuxQYOIN66sTCs0Klv7v/g6kKugiFuZ4BYc/SodpbvPCK2aul\n9o0rL2ZHyTWkreK30T8v5gfN8duKXsDSd4gRUVzPo668cFYAPfZr+uzYpwbARpVf\n4H82UAbHi3qfiJ451GvBIBBI3tcRQNapqSmWMCw285M9FUiKKperww+m9QKBgQCQ\n8u3RvRTz69NcrpgqVwSxrpvx8eeDo+iPdg1kR+lc+ngY6n4WbE+y4/i9MmVilimm\nYl2o1xEo+hpA/II6UKSIDdb+g5GdrTW1DIf85L0K6B4TEmovkUeTH879NB4L2iHx\nKg854yMjE4cG1wY3LnopvhkD4Qx4meTpoH4EBZpuUQKBgQCrsO0+uqjxjyP/FNNS\nh9mc+05gZjCISsriIE2bDOPEhvrJXip4NYrF8it+RvM8wOlq3uX0FDu9hoig/A1D\nb2dg6dwGV4IS+NRWgCunzML6bLYHQVP8hC1quaCONuiTB+ImAfrIOGDIPCYSHgXq\nc2L2JZ7eSKq+rtE2XlGFKLO9tA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "vertex-express@hire-ups.iam.gserviceaccount.com",
+  "client_id": "113146617036448537958",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vertex-express%40hire-ups.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -1,9 +1,15 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class CustomerInfoResults:
     full_name: str
     number_of_travelers: int | None = None
+
+@dataclass
+class LanguagePreferenceResults:
+    preferred_language: str
+    language_code: str | None = None
 
 @dataclass
 class TravelPlanResults:

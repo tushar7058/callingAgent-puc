@@ -1,38 +1,40 @@
+import asyncio
 import json
 import logging
-import asyncio
 import os
+
 from livekit.agents import (
     Agent,
     ToolError,
     get_job_context,
-    llm,
-    utils,
-    RunContext,
 )
 from livekit.agents.beta.tools import EndCallTool
 from livekit.agents.beta.workflows import TaskGroup
-from livekit.agents.llm.chat_context import FunctionCall
-from livekit.agents.llm.utils import execute_function_call
 
+from api.datasend import send_to_external_api
+from config.language_audio import build_stt, build_tts, resolve_language_profile
 from tasks.data_collection import (
-    CustomerInfoTask,
-    TravelPlanTask,
-    BudgetTask,
-    TravelPreferenceTask,
     AccommodationTask,
     ActivityTask,
-    ContactInfoTask
+    BudgetTask,
+    ContactInfoTask,
+    CustomerInfoTask,
+    LanguagePreferenceTask,
+    TravelPlanTask,
+    TravelPreferenceTask,
 )
 from utils.helpers import _to_json_serializable
 
 # logger = logging.getLogger("agent-Dakota-1462")
 logger = logging.getLogger("IRONMAN")
 
-
-
 class DefaultAgent(Agent):
     def __init__(self) -> None:
+        self.end_call_tool = EndCallTool(
+            extra_description="Only end the call after all data collection tasks are complete and you have said goodbye.",
+            delete_room=True,
+            end_instructions="Thank the customer for their time, let them know Mannai Travels will reach out shortly with an itinerary, and wish them a good day.",
+        )
         self._agent_instructions = """You are AIRA, a friendly, professional, and reliable travel assistant from Mannai Travels.
 You are interacting with a user via voice to plan their perfect trip.
 
@@ -55,10 +57,14 @@ You are interacting with a user via voice to plan their perfect trip.
 """
         super().__init__(
             instructions="",
+            tools=self.end_call_tool.tools,
         )
 
     async def on_enter(self):
-        greeting_instructions = "Greet the caller warmly. Introduce yourself as AIRA from Mannai Travels, and state that you are here to help plan their trip."
+        greeting_instructions = (
+            "Welcome the caller bilingually. First say 'Welcome to Mannai Travels! I am AIRA, your AI travel assistant.' "
+            "Then immediately say the Arabic equivalent (e.g., 'أهلاً بك في سفريات المناعي! أنا آيرا، مساعدك الذكي للسفر.')."
+        )
         no_question_guardrail = (
             "IMPORTANT: The greeting must be a statement only. Do NOT end with any "
             'question, including open-ended prompts like "How can I help?". The '
@@ -70,49 +76,83 @@ You are interacting with a user via voice to plan their perfect trip.
             ),
             allow_interruptions=True,
         )
-        
+
+        async def sync_language_audio(task_event) -> None:
+            if task_event.task_id != "language_preference":
+                return
+
+            preferred_language = getattr(task_event.result, "preferred_language", None)
+            profile = resolve_language_profile(preferred_language)
+            get_job_context().proc.userdata["preferred_language"] = profile.label
+            get_job_context().proc.userdata["preferred_language_code"] = profile.code
+
+            # The public AgentSession API does not expose STT/TTS setters, so we
+            # update the underlying engines after the language preference is known.
+            self.session._stt = build_stt(profile)
+            self.session._tts = build_tts(profile)
+            logger.info("updated speech language: %s (%s)", profile.label, profile.code)
+
+        def task_instructions(base_instructions: str) -> str:
+            preferred_language = get_job_context().proc.userdata.get("preferred_language")
+            if preferred_language:
+                language_line = (
+                    f"Use {preferred_language} for this task and keep all questions, prompts, and confirmations in that language."
+                )
+            else:
+                language_line = (
+                    "Use the same language the user is speaking. If they later choose a preferred language, switch to it immediately."
+                )
+            return f"{self._agent_instructions}\n{language_line}\n{base_instructions}"
+
         _task_tools = [t for t in self.tools if not isinstance(t, EndCallTool)]
-        task_group = TaskGroup(chat_ctx=self.chat_ctx)
-        
+        task_group = TaskGroup(chat_ctx=self.chat_ctx, on_task_completed=sync_language_audio)
+
+        # 0. Language Preference
+        task_group.add(
+            lambda _ai=self._agent_instructions, _tools=_task_tools: LanguagePreferenceTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            id="language_preference",
+            description="Ask which language the customer prefers for the rest of the conversation, offering only English or Arabic.",
+        )
+
         # 1. Customer Info
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: CustomerInfoTask(agent_instructions=_ai, extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: CustomerInfoTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
             id="customer_info",
             description="Collect the customer's name and number of travelers.",
         )
         # 2. Travel Plan
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPlanTask(agent_instructions=_ai, extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPlanTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
             id="travel_plan",
             description="Find out the travel source, destination, and preferred dates.",
         )
         # 3. Budget
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: BudgetTask(agent_instructions=_ai, extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: BudgetTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
             id="budget",
             description="Ask for their overall budget.",
         )
         # 4. Travel Preference
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPreferenceTask(agent_instructions=_ai, extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPreferenceTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
             id="travel_preference",
             description="Ask for their preferred mode of transportation.",
         )
         # 5. Accommodation
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: AccommodationTask(agent_instructions=_ai, extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: AccommodationTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
             id="accommodation",
             description="Ask for accommodation preferences (5-star, 4-star, etc).",
         )
         # 6. Activity
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: ActivityTask(agent_instructions=_ai, extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: ActivityTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
             id="activity",
             description="Ask what kind of activities they want to do.",
         )
         # 7. Contact Info
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: ContactInfoTask(agent_instructions=_ai, extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: ContactInfoTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
             id="contact_info",
             description="Collect the customer's email and phone number.",
         )
@@ -129,48 +169,51 @@ You are interacting with a user via voice to plan their perfect trip.
         """Serialize results, save to JSON, speak goodbye, and end the session."""
         serialized = _to_json_serializable(task_results)
         get_job_context().proc.userdata["dc_results"] = serialized
-        
+
+        preferred_language = (
+            serialized.get("language_preference", {}).get("preferred_language")
+            if isinstance(serialized, dict)
+            else None
+        ) or "English"
+        preferred_language_code = (
+            serialized.get("language_preference", {}).get("language_code")
+            if isinstance(serialized, dict)
+            else None
+        ) or resolve_language_profile(preferred_language).code
+
+        if isinstance(serialized, dict):
+            serialized["language_preference"] = {
+                **serialized.get("language_preference", {}),
+                "preferred_language": preferred_language,
+                "language_code": preferred_language_code,
+            }
+
         # Save to JSON file so the user can see it!
         try:
-            os.makedirs("src/logs", exist_ok=True)
-            with open("src/logs/latest_travel_lead.json", "w") as f:
+            # os.makedirs("src/logs", exist_ok=True)
+            os.makedirs("src/data",exist_ok=True)
+            with open("src/data/latest_travel_lead.json","w")as f:
+            # with open("src/logs/latest_travel_lead.json", "w") as f:
                 json.dump(serialized, f, indent=2)
-            logger.info("Saved travel lead data to src/logs/latest_travel_lead.json")
+            logger.info("Saved travel lead data to src/data/latest_travel_lead.json")
         except Exception as e:
             logger.error(f"Failed to save JSON: {e}")
 
-        end_instructions = "Thank the customer for their time, let them know Mannai Travels will reach out shortly with an itinerary, and say a warm goodbye."
+        try:
+            send_to_external_api({"task_results": serialized})
+            logger.info("Sent travel lead data to external API")
+        except Exception as e:
+            logger.error(f"Failed to send travel lead data to external API: {e}")
 
-        summary_task: asyncio.Task | None = None
-        await self.update_tools([t for t in self.tools if not isinstance(t, EndCallTool)])
-
-        speech_handle = self.session.generate_reply(
-            instructions=f"All data collection tasks are complete. {end_instructions}",
-            tool_choice="none",
+        language_guidance = (
+            f"Speak entirely in {preferred_language}. Keep the tone warm and professional."
         )
 
+        speech_handle = self.session.generate_reply(
+            instructions=f"All data collection tasks are complete. {language_guidance} You MUST now use the end_call tool to say goodbye and end the conversation.",
+            tool_choice="auto",
+        )
         try:
             await speech_handle
-            if summary_task:
-                await summary_task
         except ConnectionError:
             logger.debug("user disconnected during goodbye speech")
-
-        try:
-            end_call_tool = next((t for t in self.tools if isinstance(t, EndCallTool)), None)
-            if not end_call_tool:
-                end_call_tool = EndCallTool(
-                    end_instructions=end_instructions,
-                    delete_room=False,
-                )
-
-            tools_with_end_call = [*self.tools, end_call_tool]
-            tool_ctx = llm.ToolContext(tools_with_end_call)
-            end_call_id = utils.shortuuid("fnc_")
-            tool_call = llm.FunctionToolCall(call_id=end_call_id, name="end_call", arguments="{}")
-            fnc_call = FunctionCall(call_id=end_call_id, name="end_call", arguments="{}")
-            call_ctx = RunContext(session=self.session, speech_handle=speech_handle, function_call=fnc_call)
-            
-            await execute_function_call(tool_call, tool_ctx, call_ctx=call_ctx)
-        except (ConnectionError, RuntimeError):
-            logger.debug("room already disconnected during end-call teardown")

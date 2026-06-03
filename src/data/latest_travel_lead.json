@@ -1,0 +1,31 @@
+{
+  "language_preference": {
+    "preferred_language": "English",
+    "language_code": "en-US"
+  },
+  "customer_info": {
+    "full_name": "Tushar",
+    "number_of_travelers": 5
+  },
+  "travel_plan": {
+    "source": "Mumbai",
+    "destination": "Goa",
+    "travel_dates": "next week, 10th to 15th"
+  },
+  "budget": {
+    "budget": "10000"
+  },
+  "travel_preference": {
+    "transportation_mode": "train"
+  },
+  "accommodation": {
+    "accommodation_type": "villa"
+  },
+  "activity": {
+    "activities": "adventure sports, sightseeing, relaxing time on the beach"
+  },
+  "contact_info": {
+    "phone_number": "7058949269",
+    "email_address": "tushowcase816@gmail.com"
+  }
+}

@@ -8,13 +8,14 @@ from livekit.agents import (
     JobProcess,
     TurnHandlingOptions,
     cli,
-    inference,
     room_io,
 )
 from livekit.plugins import ai_coustics, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from agents.sales_agent import DefaultAgent
+from config.language_audio import build_stt, build_tts, resolve_language_profile
+from livekit.plugins import google
 
 logger = logging.getLogger("IRONMAN")
 
@@ -23,7 +24,8 @@ load_dotenv(".env")
 server = AgentServer()
 
 def prewarm(proc: JobProcess):
-    proc.userdata["vad"] = silero.VAD.load()
+    # Aggressively reduce silence duration so the AI responds faster when user stops speaking
+    proc.userdata["vad"] = silero.VAD.load(min_silence_duration=0.4)
 
 server.setup_fnc = prewarm
 
@@ -31,34 +33,27 @@ server.setup_fnc = prewarm
 async def entrypoint(ctx: JobContext):
     # Wait for the SIP caller to join the room
     participant = await ctx.wait_for_participant()
-    
+
     if participant.kind == rtc.ParticipantKind.PARTICIPANT_KIND_SIP:
         # Retrieve caller ID
         phone_number = participant.attributes.get('sip.phoneNumber', 'unknown')
         logger.info(f"SIP caller joined from number: {phone_number}")
 
+    default_profile = resolve_language_profile("English")
+
     session = AgentSession(
-        stt=inference.STT(model="elevenlabs/scribe_v2_realtime", language="en"),
-        llm=inference.LLM(
-            model="google/gemini-3.1-flash-lite",
-            extra_kwargs={"reasoning_effort": "low"},
+        stt=build_stt(default_profile),
+        llm=google.LLM(
+            model="gemini-3.1-flash-lite",
+            # max_output_tokens= 100,
+            # temperature= 0,
         ),
-        # tts=inference.TTS(
-        #     model="cartesia/sonic-3",
-        #     voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc",
-        #     language="en"
-        # ),
-        tts = inference.TTS(
-            model="elevenlabs/eleven_multilingual_v2",
-            voice="ecp3DWciuUyW7BYM7II1",
-            language="en"
-        ),
+        tts=build_tts(default_profile),
         turn_handling=TurnHandlingOptions(turn_detection=MultilingualModel()),
         vad=ctx.proc.userdata["vad"],
         preemptive_generation=True,
     )
     ctx.proc.userdata["dc_results"] = None
-
     await session.start(
         agent=DefaultAgent(),
         room=ctx.room,
