@@ -32,3 +32,4 @@ KMS
 # GitHub CLI
 .github/personal-instructions.md
 key.json
+src/.livekit
