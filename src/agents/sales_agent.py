@@ -29,6 +29,11 @@ from utils.tools import best_TravelOption, gethotel_details, locationbasedactivi
 # logger = logging.getLogger("agent-Dakota-1462")
 logger = logging.getLogger("IRONMAN")
 
+
+def _without_end_call_tools(tools):
+    return [tool for tool in tools if getattr(tool, "id", None) != "end_call"]
+
+
 class DefaultAgent(Agent):
     def __init__(self) -> None:
         self.end_call_tool = EndCallTool(
@@ -73,7 +78,13 @@ You are interacting with a user via voice to plan their perfect trip.
         )
         await self.session.generate_reply(
             instructions="\n".join(
-                part for part in (self._agent_instructions, greeting_instructions, no_question_guardrail) if part
+                part
+                for part in (
+                    self._agent_instructions,
+                    greeting_instructions,
+                    no_question_guardrail,
+                )
+                if part
             ),
             allow_interruptions=True,
         )
@@ -94,66 +105,89 @@ You are interacting with a user via voice to plan their perfect trip.
             logger.info("updated speech language: %s (%s)", profile.label, profile.code)
 
         def task_instructions(base_instructions: str) -> str:
-            preferred_language = get_job_context().proc.userdata.get("preferred_language")
+            preferred_language = get_job_context().proc.userdata.get(
+                "preferred_language"
+            )
             if preferred_language:
-                language_line = (
-                    f"Use {preferred_language} for this task and keep all questions, prompts, and confirmations in that language."
-                )
+                language_line = f"Use {preferred_language} for this task and keep all questions, prompts, and confirmations in that language."
             else:
-                language_line = (
-                    "Use the same language the user is speaking. If they later choose a preferred language, switch to it immediately."
-                )
+                language_line = "Use the same language the user is speaking. If they later choose a preferred language, switch to it immediately."
             return f"{self._agent_instructions}\n{language_line}\n{base_instructions}"
 
-        _task_tools = [t for t in self.tools if not isinstance(t, EndCallTool)]
-        task_group = TaskGroup(chat_ctx=self.chat_ctx, on_task_completed=sync_language_audio)
+        _task_tools = _without_end_call_tools(self.tools)
+        task_group = TaskGroup(
+            chat_ctx=self.chat_ctx, on_task_completed=sync_language_audio
+        )
 
         # 0. Language Preference
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: LanguagePreferenceTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: (
+                LanguagePreferenceTask(
+                    agent_instructions=task_instructions(_ai), extra_tools=_tools
+                )
+            ),
             id="language_preference",
             description="Ask which language the customer prefers for the rest of the conversation, offering only English or Arabic.",
         )
 
         # 1. Customer Info
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: CustomerInfoTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: CustomerInfoTask(
+                agent_instructions=task_instructions(_ai), extra_tools=_tools
+            ),
             id="customer_info",
             description="Collect the customer's name and number of travelers.",
         )
         # 2. Travel Plan
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPlanTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPlanTask(
+                agent_instructions=task_instructions(_ai), extra_tools=_tools
+            ),
             id="travel_plan",
             description="Find out the travel source, destination, and preferred dates.",
         )
         # 3. Budget
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: BudgetTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: BudgetTask(
+                agent_instructions=task_instructions(_ai), extra_tools=_tools
+            ),
             id="budget",
             description="Ask for their overall budget.",
         )
         # 4. Travel Preference
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPreferenceTask(agent_instructions=task_instructions(_ai), extra_tools=_tools + [best_TravelOption]),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: (
+                TravelPreferenceTask(
+                    agent_instructions=task_instructions(_ai),
+                    extra_tools=[*_tools, best_TravelOption],
+                )
+            ),
             id="travel_preference",
             description="Ask for their preferred mode of transportation.",
         )
         # 5. Accommodation
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: AccommodationTask(agent_instructions=task_instructions(_ai), extra_tools=_tools + [gethotel_details]),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: AccommodationTask(
+                agent_instructions=task_instructions(_ai),
+                extra_tools=[*_tools, gethotel_details],
+            ),
             id="accommodation",
             description="Ask for accommodation preferences (5-star, 4-star, etc).",
         )
         # 6. Activity
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: ActivityTask(agent_instructions=task_instructions(_ai), extra_tools=_tools + [locationbasedactivitydetail]),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: ActivityTask(
+                agent_instructions=task_instructions(_ai),
+                extra_tools=[*_tools, locationbasedactivitydetail],
+            ),
             id="activity",
             description="Ask what kind of activities they want to do.",
         )
         # 7. Contact Info
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: ContactInfoTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: ContactInfoTask(
+                agent_instructions=task_instructions(_ai), extra_tools=_tools
+            ),
             id="contact_info",
             description="Collect the customer's email and phone number.",
         )
@@ -161,7 +195,9 @@ You are interacting with a user via voice to plan their perfect trip.
         try:
             group_result = await task_group
         except (ToolError, asyncio.CancelledError):
-            logger.info("data collection task group cancelled (participant likely disconnected)")
+            logger.info(
+                "data collection task group cancelled (participant likely disconnected)"
+            )
             return
 
         await self._finish_data_collection(group_result.task_results)
@@ -192,9 +228,9 @@ You are interacting with a user via voice to plan their perfect trip.
         # Save to JSON file so the user can see it!
         try:
             # os.makedirs("src/logs", exist_ok=True)
-            os.makedirs("src/data",exist_ok=True)
-            with open("src/data/latest_travel_lead.json","w")as f:
-            # with open("src/logs/latest_travel_lead.json", "w") as f:
+            os.makedirs("src/data", exist_ok=True)
+            with open("src/data/latest_travel_lead.json", "w") as f:
+                # with open("src/logs/latest_travel_lead.json", "w") as f:
                 json.dump(serialized, f, indent=2)
             logger.info("Saved travel lead data to src/data/latest_travel_lead.json")
         except Exception as e:
@@ -206,9 +242,7 @@ You are interacting with a user via voice to plan their perfect trip.
         except Exception as e:
             logger.error(f"Failed to send travel lead data to external API: {e}")
 
-        language_guidance = (
-            f"Speak entirely in {preferred_language}. Keep the tone warm and professional."
-        )
+        language_guidance = f"Speak entirely in {preferred_language}. Keep the tone warm and professional."
 
         speech_handle = self.session.generate_reply(
             instructions=f"All data collection tasks are complete. {language_guidance} You MUST now use the end_call tool to say goodbye and end the conversation.",

@@ -4,28 +4,49 @@
     "language_code": "en-US"
   },
   "customer_info": {
-    "full_name": "John Doe",
+    "full_name": "Alex",
     "number_of_travelers": 5
   },
   "travel_plan": {
     "source": "Mumbai",
-    "destination": "Goa",
-    "travel_dates": "in two weeks"
+    "destination": "Kolkata",
+    "travel_dates": "10 to 15 of next week"
   },
   "budget": {
-    "budget": "10,000"
+    "budget": "30000"
   },
   "travel_preference": {
-    "transportation_mode": "flight"
+    "transportation_mode": "flight",
+    "selected_option": "IndiGo flight from Mumbai to Kolkata",
+    "provider_name": "IndiGo",
+    "estimated_price": null,
+    "duration": null,
+    "departure_time": null,
+    "arrival_time": null,
+    "notes": null
   },
   "accommodation": {
-    "accommodation_type": "The Grand Plaza 5-star hotel"
+    "accommodation_type": "5-star hotel",
+    "hotel_name": "ITC Royal Bengal, a Luxury Collection Hotel, Kolkata",
+    "hotel_rating": "5-star",
+    "room_type": null,
+    "location_preference": null,
+    "meal_plan": null,
+    "amenities": null,
+    "estimated_price": null,
+    "notes": null
   },
   "activity": {
-    "activities": "Relaxing day at the spa"
+    "activities": "comprehensive cultural heritage tour",
+    "selected_activity": "comprehensive cultural heritage tour",
+    "activity_category": "culture",
+    "tour_type": null,
+    "preferred_time": null,
+    "estimated_price": null,
+    "notes": "Guided tour to explore Kolkata's history and traditions. Mannai Travels will verify live availability and pricing before final booking."
   },
   "contact_info": {
-    "phone_number": "+91705949269",
-    "email_address": "John Doe 816@gmail.com"
+    "phone_number": "1234567890",
+    "email_address": "alex123@gmail.com"
   }
 }
