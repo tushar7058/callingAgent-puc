@@ -17,20 +17,25 @@ from agents.sales_agent import DefaultAgent
 from config.language_audio import build_stt, build_tts, resolve_language_profile
 from livekit.plugins import google
 
-logger = logging.getLogger("IRONMAN")
+# logger = logging.getLogger("IRONMAN")
+# logger = logging.getLogger("Dakota-1462")
+logger = logging.getLogger("interview-agent")
+from livekit.agents import WorkerOptions, cli
+
 
 load_dotenv(".env")
 
-server = AgentServer()
+# server = AgentServer()
 
 def prewarm(proc: JobProcess):
     # Aggressively reduce silence duration so the AI responds faster when user stops speaking
     proc.userdata["vad"] = silero.VAD.load(min_silence_duration=0.4)
 
-server.setup_fnc = prewarm
-
-@server.rtc_session(agent_name="IRONMAN")
 async def entrypoint(ctx: JobContext):
+    # ✅ CONNECT AGENT TO ROOM (MISSING STEP)
+    await ctx.connect()
+    print("✅ AGENT CONNECTED")
+
     # Wait for the SIP caller to join the room
     participant = await ctx.wait_for_participant()
 
@@ -66,5 +71,16 @@ async def entrypoint(ctx: JobContext):
         ),
     )
 
+
 if __name__ == "__main__":
-    cli.run_app(server)
+    cli.run_app(
+        WorkerOptions(
+            entrypoint_fnc=entrypoint,
+            prewarm_fnc=prewarm,
+            agent_name="interview-agent"   # ✅ FIXED NAME
+        )
+    )
+
+
+# if __name__ == "__main__":
+#     cli.run_app(server)

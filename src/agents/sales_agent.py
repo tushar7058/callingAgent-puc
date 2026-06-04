@@ -27,7 +27,8 @@ from utils.helpers import _to_json_serializable
 from utils.tools import best_TravelOption, gethotel_details, locationbasedactivitydetail
 
 # logger = logging.getLogger("agent-Dakota-1462")
-logger = logging.getLogger("IRONMAN")
+# logger = logging.getLogger("Dakota-1462")
+logger = logging.getLogger("interview-agent")
 
 
 def _without_end_call_tools(tools):

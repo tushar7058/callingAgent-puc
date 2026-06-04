@@ -4,49 +4,49 @@
     "language_code": "en-US"
   },
   "customer_info": {
-    "full_name": "Alex",
-    "number_of_travelers": 5
+    "full_name": "John Doe",
+    "number_of_travelers": 4
   },
   "travel_plan": {
     "source": "Mumbai",
-    "destination": "Kolkata",
-    "travel_dates": "10 to 15 of next week"
+    "destination": "Corsica",
+    "travel_dates": "15 July"
   },
   "budget": {
-    "budget": "30000"
+    "budget": "15 lakhs"
   },
   "travel_preference": {
     "transportation_mode": "flight",
-    "selected_option": "IndiGo flight from Mumbai to Kolkata",
-    "provider_name": "IndiGo",
-    "estimated_price": null,
+    "selected_option": null,
+    "provider_name": "Lufthansa",
+    "estimated_price": "$792 per passenger",
     "duration": null,
     "departure_time": null,
     "arrival_time": null,
     "notes": null
   },
   "accommodation": {
-    "accommodation_type": "5-star hotel",
-    "hotel_name": "ITC Royal Bengal, a Luxury Collection Hotel, Kolkata",
-    "hotel_rating": "5-star",
+    "accommodation_type": "luxury hotel",
+    "hotel_name": "Hotel on Route de Palombaggia",
+    "hotel_rating": null,
     "room_type": null,
-    "location_preference": null,
+    "location_preference": "Porto-Vecchio",
     "meal_plan": null,
     "amenities": null,
     "estimated_price": null,
-    "notes": null
+    "notes": "User confirmed to shortlist this luxury hotel."
   },
   "activity": {
-    "activities": "comprehensive cultural heritage tour",
-    "selected_activity": "comprehensive cultural heritage tour",
-    "activity_category": "culture",
-    "tour_type": null,
+    "activities": "sea kayaking",
+    "selected_activity": "sea kayaking",
+    "activity_category": "water activities",
+    "tour_type": "outdoor adventure",
     "preferred_time": null,
     "estimated_price": null,
-    "notes": "Guided tour to explore Kolkata's history and traditions. Mannai Travels will verify live availability and pricing before final booking."
+    "notes": "shortlisted for the group of four"
   },
   "contact_info": {
-    "phone_number": "1234567890",
-    "email_address": "alex123@gmail.com"
+    "phone_number": "7757939190",
+    "email_address": "johndoe@gmail.com"
   }
 }
