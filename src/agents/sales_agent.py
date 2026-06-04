@@ -24,6 +24,7 @@ from tasks.data_collection import (
     TravelPreferenceTask,
 )
 from utils.helpers import _to_json_serializable
+from utils.tools import best_TravelOption, gethotel_details, locationbasedactivitydetail
 
 # logger = logging.getLogger("agent-Dakota-1462")
 logger = logging.getLogger("IRONMAN")
@@ -134,19 +135,19 @@ You are interacting with a user via voice to plan their perfect trip.
         )
         # 4. Travel Preference
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPreferenceTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: TravelPreferenceTask(agent_instructions=task_instructions(_ai), extra_tools=_tools + [best_TravelOption]),
             id="travel_preference",
             description="Ask for their preferred mode of transportation.",
         )
         # 5. Accommodation
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: AccommodationTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: AccommodationTask(agent_instructions=task_instructions(_ai), extra_tools=_tools + [gethotel_details]),
             id="accommodation",
             description="Ask for accommodation preferences (5-star, 4-star, etc).",
         )
         # 6. Activity
         task_group.add(
-            lambda _ai=self._agent_instructions, _tools=_task_tools: ActivityTask(agent_instructions=task_instructions(_ai), extra_tools=_tools),
+            lambda _ai=self._agent_instructions, _tools=_task_tools: ActivityTask(agent_instructions=task_instructions(_ai), extra_tools=_tools + [locationbasedactivitydetail]),
             id="activity",
             description="Ask what kind of activities they want to do.",
         )

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from livekit.plugins import google
-
+from livekit.plugins import elevenlabs
 
 @dataclass(frozen=True)
 class LanguageProfile:
@@ -51,13 +51,12 @@ def build_stt(profile: LanguageProfile):
         location="global",
     )
 
-
 def build_tts(profile: LanguageProfile):
     return google.TTS(
-        # model_name="gemi ni-2.5-flash-tts",
         model_name="gemini-2.5-flash-lite-preview-tts",
         gender="female",
         voice_name="Achernar",
         language=profile.code,
         use_streaming=True,
     )
+

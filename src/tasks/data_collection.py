@@ -82,7 +82,10 @@ class BudgetTask(AgentTask):
 class TravelPreferenceTask(AgentTask):
     def __init__(self, agent_instructions: str, extra_tools: list | None = None):
         super().__init__(
-            instructions=_build_task_instructions(agent_instructions, "- Ask for their preferred mode of transportation (e.g., flight, train, bus)."),
+            instructions=_build_task_instructions(
+                agent_instructions, 
+                "- Ask for their preferred mode of transportation (e.g., flight, train, bus).\n- IMPORTANT: Once they reply, call the 'best_TravelOption' tool to fetch options for their route.\n- Present the options from the tool back to the user and ask which one they prefer to book.\n- Only after they confirm a specific option, record it using the record tool."
+            ),
             tools=list(extra_tools) if extra_tools else [],
         )
     async def on_enter(self):
@@ -96,7 +99,10 @@ class TravelPreferenceTask(AgentTask):
 class AccommodationTask(AgentTask):
     def __init__(self, agent_instructions: str, extra_tools: list | None = None):
         super().__init__(
-            instructions=_build_task_instructions(agent_instructions, "- Ask for accommodation preferences (e.g., 5-star, 4-star, villa)."),
+            instructions=_build_task_instructions(
+                agent_instructions, 
+                "- Ask for accommodation preferences (e.g., 5-star, 4-star, villa).\n- IMPORTANT: Once they reply, call the 'gethotel_details' tool using their destination city.\n- Suggest the specific hotels from the tool's response and ask which they prefer.\n- Only after they confirm a specific hotel, record it."
+            ),
             tools=list(extra_tools) if extra_tools else [],
         )
     async def on_enter(self):
@@ -110,7 +116,10 @@ class AccommodationTask(AgentTask):
 class ActivityTask(AgentTask):
     def __init__(self, agent_instructions: str, extra_tools: list | None = None):
         super().__init__(
-            instructions=_build_task_instructions(agent_instructions, "- Ask what kind of activities they want to do (e.g., adventure, sightseeing, relaxing)."),
+            instructions=_build_task_instructions(
+                agent_instructions, 
+                "- Ask what kind of activities they want to do (e.g., adventure, sightseeing, relaxing).\n- IMPORTANT: Once they reply, call the 'locationbasedactivitydetail' tool for their destination.\n- Suggest the specific activities from the tool's response and ask which they prefer.\n- Only after they confirm a specific activity, record it."
+            ),
             tools=list(extra_tools) if extra_tools else [],
         )
     async def on_enter(self):

@@ -4,28 +4,28 @@
     "language_code": "en-US"
   },
   "customer_info": {
-    "full_name": "Tushar",
+    "full_name": "John Doe",
     "number_of_travelers": 5
   },
   "travel_plan": {
     "source": "Mumbai",
     "destination": "Goa",
-    "travel_dates": "next week, 10th to 15th"
+    "travel_dates": "in two weeks"
   },
   "budget": {
-    "budget": "10000"
+    "budget": "10,000"
   },
   "travel_preference": {
-    "transportation_mode": "train"
+    "transportation_mode": "flight"
   },
   "accommodation": {
-    "accommodation_type": "villa"
+    "accommodation_type": "The Grand Plaza 5-star hotel"
   },
   "activity": {
-    "activities": "adventure sports, sightseeing, relaxing time on the beach"
+    "activities": "Relaxing day at the spa"
   },
   "contact_info": {
-    "phone_number": "7058949269",
-    "email_address": "tushowcase816@gmail.com"
+    "phone_number": "+91705949269",
+    "email_address": "John Doe 816@gmail.com"
   }
 }
