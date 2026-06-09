@@ -28,6 +28,7 @@ def test_send_to_external_api_posts_json(monkeypatch):
         captured["url"] = req.full_url
         captured["headers"] = dict(req.headers)
         captured["timeout"] = timeout
+        captured["raw_body"] = req.data
         captured["body"] = json.loads(req.data.decode("utf-8"))
         return DummyResponse()
 
@@ -35,10 +36,14 @@ def test_send_to_external_api_posts_json(monkeypatch):
     monkeypatch.setenv("EXTERNAL_API_TOKEN", "secret-token")
     monkeypatch.setattr(datasend.request, "urlopen", fake_urlopen)
 
-    datasend.send_to_external_api({"task_results": {"hello": "world"}}, timeout=3.5)
+    datasend.send_to_external_api(
+        {"customer_info": {"full_name": "أحمد"}},
+        timeout=3.5,
+    )
 
     assert captured["url"] == "https://example.com/webhook"
     assert get_header("Content-Type") == "application/json"
     assert get_header("Authorization") == "Bearer secret-token"
     assert captured["timeout"] == 3.5
-    assert captured["body"] == {"task_results": {"hello": "world"}}
+    assert "أحمد".encode() in captured["raw_body"]
+    assert captured["body"] == {"customer_info": {"full_name": "أحمد"}}

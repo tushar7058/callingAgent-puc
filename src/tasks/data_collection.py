@@ -1,14 +1,15 @@
 from livekit.agents import AgentTask, RunContext, function_tool, get_job_context
 
+from config.language_audio import resolve_language_profile
 from models.data_collection import (
     AccommodationPreferenceResults,
     ActivityPreferenceResults,
     BudgetResults,
-    ContactInfoResults,
     CustomerInfoResults,
+    FoodPreferenceResults,
     LanguagePreferenceResults,
+    SupportServicesResults,
     TravelPlanResults,
-    TravelPreferenceResults,
 )
 
 
@@ -20,7 +21,7 @@ def _build_task_instructions(
         if is_first
         else "The user has already been greeted. Do not introduce yourself or say hello. Directly ask for the required information.\n"
     )
-    suffix = "\nIMPORTANT: Do NOT say goodbye, recap the full conversation, or tell the user you are done. Only focus on collecting the information for THIS specific task. If the information was already provided earlier in the conversation, confirm it briefly and then record it immediately using the appropriate tool."
+    suffix = "\nIMPORTANT: Do NOT search live availability, recommend options, give prices, provide travel advice, say goodbye, recap the full conversation, or tell the user you are done. Only collect the information for THIS specific task. If the information was already provided earlier in the conversation, confirm it briefly and then record it immediately using the appropriate tool."
     return prefix + agent_instructions + "\n" + task_instructions + suffix
 
 
@@ -29,7 +30,7 @@ class CustomerInfoTask(AgentTask):
         super().__init__(
             instructions=_build_task_instructions(
                 agent_instructions,
-                "- Collect the customer's full name and how many people are traveling.",
+                "- Collect the customer's full name, phone number, email address, total travelers, and traveler split when available: adults, kids, and senior citizens.\n- If the user does not know the split, record the total and leave the split fields empty.",
                 is_first=True,
             ),
             tools=list(extra_tools) if extra_tools else [],
@@ -47,12 +48,23 @@ class CustomerInfoTask(AgentTask):
         self,
         context: RunContext,
         full_name: str,
-        number_of_travelers: int | None = None,
+        phone_number: str | None = None,
+        email_address: str | None = None,
+        total_travelers: int | None = None,
+        adults: int | None = None,
+        kids: int | None = None,
+        senior_citizens: int | None = None,
     ):
-        """Call when you have collected the customer's name and number of travelers."""
+        """Call when you have collected customer identity, contact, and travel group information."""
         self.complete(
             CustomerInfoResults(
-                full_name=full_name, number_of_travelers=number_of_travelers
+                full_name=full_name,
+                phone_number=phone_number,
+                email_address=email_address,
+                total_travelers=total_travelers,
+                adults=adults,
+                kids=kids,
+                senior_citizens=senior_citizens,
             )
         )
 
@@ -80,8 +92,15 @@ class LanguagePreferenceTask(AgentTask):
         self, context: RunContext, preferred_language: str
     ):
         """Call when you have collected the customer's preferred language."""
-        get_job_context().proc.userdata["preferred_language"] = preferred_language
-        self.complete(LanguagePreferenceResults(preferred_language=preferred_language))
+        profile = resolve_language_profile(preferred_language)
+        get_job_context().proc.userdata["preferred_language"] = profile.label
+        get_job_context().proc.userdata["preferred_language_code"] = profile.code
+        self.complete(
+            LanguagePreferenceResults(
+                preferred_language=profile.label,
+                language_code=profile.code,
+            )
+        )
 
 
 class TravelPlanTask(AgentTask):
@@ -89,7 +108,7 @@ class TravelPlanTask(AgentTask):
         super().__init__(
             instructions=_build_task_instructions(
                 agent_instructions,
-                "- Find out the travel source and destination and preferred travel dates or duration.",
+                "- Collect the travel source, destination, destination type or trip style, start date, end date, whether dates are flexible, and preferred transportation mode.\n- Record dates as YYYY-MM-DD when the user provides exact dates. If dates are flexible, set flexible to true and leave unknown exact dates empty.",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
@@ -107,12 +126,22 @@ class TravelPlanTask(AgentTask):
         context: RunContext,
         source: str,
         destination: str,
-        travel_dates: str | None = None,
+        destination_type: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        flexible: bool | None = None,
+        transportation_mode: str | None = None,
     ):
-        """Call when you have collected the source, destination, and dates."""
+        """Call when you have collected travel plan fields."""
         self.complete(
             TravelPlanResults(
-                source=source, destination=destination, travel_dates=travel_dates
+                source=source,
+                destination=destination,
+                destination_type=destination_type,
+                start_date=start_date,
+                end_date=end_date,
+                flexible=flexible,
+                transportation_mode=transportation_mode,
             )
         )
 
@@ -121,7 +150,8 @@ class BudgetTask(AgentTask):
     def __init__(self, agent_instructions: str, extra_tools: list | None = None):
         super().__init__(
             instructions=_build_task_instructions(
-                agent_instructions, "- Ask for their overall budget for the trip."
+                agent_instructions,
+                "- Collect the budget range if available, budget type such as Economy, Standard, Premium, or Luxury, whether they are flexible, and any budget notes.",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
@@ -134,51 +164,20 @@ class BudgetTask(AgentTask):
         )
 
     @function_tool(name="record_budget")
-    async def record_budget(self, context: RunContext, budget: str):
-        """Call when you have collected the budget."""
-        self.complete(BudgetResults(budget=budget))
-
-
-class TravelPreferenceTask(AgentTask):
-    def __init__(self, agent_instructions: str, extra_tools: list | None = None):
-        super().__init__(
-            instructions=_build_task_instructions(
-                agent_instructions,
-                "- Ask for their preferred mode of transportation (e.g., flight, train, bus).\n- IMPORTANT: Once they reply, call the 'best_TravelOption' tool to fetch realtime options for their route. Include source, destination, travel dates, preferred mode, customer language, and destination country when known.\n- Present only the reliable options from the tool back to the user and ask which one they prefer to shortlist.\n- If the tool says realtime search is not configured or unavailable, do not invent details. Tell the customer Mannai Travels will verify live availability before final booking.\n- Only after they confirm a specific option, call record_travel_preference with structured details: transportation mode, selected option name, provider name, estimated price, duration, departure time, arrival time, and notes when known. Do not end the call.",
-            ),
-            tools=list(extra_tools) if extra_tools else [],
-        )
-
-    async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
-
-    @function_tool(name="record_travel_preference")
-    async def record_travel_preference(
+    async def record_budget(
         self,
         context: RunContext,
-        transportation_mode: str,
-        selected_option: str | None = None,
-        provider_name: str | None = None,
-        estimated_price: str | None = None,
-        duration: str | None = None,
-        departure_time: str | None = None,
-        arrival_time: str | None = None,
+        budget_range: str | None = None,
+        budget_type: str | None = None,
+        flexibility: bool | None = None,
         notes: str | None = None,
     ):
-        """Call when the customer confirms a transport option to shortlist. Include provider, price, timing, duration, and notes when known."""
+        """Call when you have collected budget fields."""
         self.complete(
-            TravelPreferenceResults(
-                transportation_mode=transportation_mode,
-                selected_option=selected_option,
-                provider_name=provider_name,
-                estimated_price=estimated_price,
-                duration=duration,
-                departure_time=departure_time,
-                arrival_time=arrival_time,
+            BudgetResults(
+                budget_range=budget_range,
+                budget_type=budget_type,
+                flexibility=flexibility,
                 notes=notes,
             )
         )
@@ -189,7 +188,7 @@ class AccommodationTask(AgentTask):
         super().__init__(
             instructions=_build_task_instructions(
                 agent_instructions,
-                "- Ask for accommodation preferences (e.g., 5-star, 4-star, villa, beach resort, city hotel, family room).\n- IMPORTANT: Once they reply, call the 'gethotel_details' tool using their destination city. Include accommodation preference, travel dates, customer language, and destination country when known.\n- Suggest only the reliable hotels from the tool's response and ask which one they prefer to shortlist.\n- If the tool says realtime search is not configured or unavailable, do not invent hotel names, rates, or availability. Tell the customer Mannai Travels will verify live availability before final booking.\n- Only after they confirm a specific hotel, call record_accommodation with structured details: accommodation type, hotel name, hotel rating, room type, location preference, meal plan, amenities, estimated price, and notes when known. Do not end the call.",
+                "- Collect accommodation type, hotel rating, room type, important preferences, experience expectation, estimated price if the user volunteers it, and notes.\n- For preferences, capture whether they want breakfast included, pool, spa, wifi, kids friendly property, and near attractions.\n- Do not suggest hotel names, search availability, or quote prices.",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
@@ -205,26 +204,32 @@ class AccommodationTask(AgentTask):
     async def record_accommodation(
         self,
         context: RunContext,
-        accommodation_type: str,
-        hotel_name: str | None = None,
+        accommodation_type: str | None = None,
         hotel_rating: str | None = None,
         room_type: str | None = None,
-        location_preference: str | None = None,
-        meal_plan: str | None = None,
-        amenities: str | None = None,
+        breakfast_included: bool | None = None,
+        pool: bool | None = None,
+        spa: bool | None = None,
+        wifi: bool | None = None,
+        kids_friendly: bool | None = None,
+        near_attractions: bool | None = None,
+        experience_expectation: str | None = None,
         estimated_price: str | None = None,
         notes: str | None = None,
     ):
-        """Call when the customer confirms an accommodation option to shortlist. Include hotel, rating, room, location, meal, amenities, price, and notes when known."""
+        """Call when you have collected accommodation preference fields."""
         self.complete(
             AccommodationPreferenceResults(
                 accommodation_type=accommodation_type,
-                hotel_name=hotel_name,
                 hotel_rating=hotel_rating,
                 room_type=room_type,
-                location_preference=location_preference,
-                meal_plan=meal_plan,
-                amenities=amenities,
+                breakfast_included=breakfast_included,
+                pool=pool,
+                spa=spa,
+                wifi=wifi,
+                kids_friendly=kids_friendly,
+                near_attractions=near_attractions,
+                experience_expectation=experience_expectation,
                 estimated_price=estimated_price,
                 notes=notes,
             )
@@ -236,7 +241,7 @@ class ActivityTask(AgentTask):
         super().__init__(
             instructions=_build_task_instructions(
                 agent_instructions,
-                "- Ask what kind of activities they want to do (e.g., adventure, sightseeing, relaxing, private tours, food, culture).\n- IMPORTANT: Once they reply, call the 'locationbasedactivitydetail' tool for their destination. Include activity preference, travel dates, customer language, and destination country when known.\n- Suggest only the reliable activities from the tool's response and ask which one they prefer to shortlist.\n- If the tool says realtime search is not configured or unavailable, do not invent ticket prices, schedules, or availability. Tell the customer Mannai Travels will verify live availability before final booking.\n- Only after they confirm a specific activity, call record_activity with structured details: requested activity preference, selected activity, activity category, tour type, preferred time, estimated price, and notes when known. Do not end the call.",
+                "- Collect the activity interest profile as a list, such as sightseeing, culture, nature, relaxation, adventure, shopping, or food.\n- Do not suggest activity names, search live availability, or quote ticket prices.",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
@@ -252,34 +257,22 @@ class ActivityTask(AgentTask):
     async def record_activity(
         self,
         context: RunContext,
-        activities: str,
-        selected_activity: str | None = None,
-        activity_category: str | None = None,
-        tour_type: str | None = None,
-        preferred_time: str | None = None,
-        estimated_price: str | None = None,
-        notes: str | None = None,
+        interest_profile: list[str],
     ):
-        """Call when the customer confirms an activity to shortlist. Include selected activity, category, tour type, timing, price, and notes when known."""
+        """Call when you have collected the customer's activity interests."""
         self.complete(
             ActivityPreferenceResults(
-                activities=activities,
-                selected_activity=selected_activity,
-                activity_category=activity_category,
-                tour_type=tour_type,
-                preferred_time=preferred_time,
-                estimated_price=estimated_price,
-                notes=notes,
+                interest_profile=interest_profile,
             )
         )
 
 
-class ContactInfoTask(AgentTask):
+class FoodPreferenceTask(AgentTask):
     def __init__(self, agent_instructions: str, extra_tools: list | None = None):
         super().__init__(
             instructions=_build_task_instructions(
                 agent_instructions,
-                "- Collect the customer's contact information (email and phone number).",
+                "- Collect food preference type, dietary requirements if any, and special food notes.\n- Preference type examples: Vegetarian, Non-Vegetarian, Mix of Both, Halal, Jain, or No Preference.",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
@@ -291,14 +284,56 @@ class ContactInfoTask(AgentTask):
             tool_choice="auto",
         )
 
-    @function_tool(name="record_contact_info")
-    async def record_contact_info(
+    @function_tool(name="record_food_preferences")
+    async def record_food_preferences(
         self,
         context: RunContext,
-        phone_number: str | None = None,
-        email_address: str | None = None,
+        preference_type: str | None = None,
+        dietary_requirements: str | None = None,
+        special_notes: str | None = None,
     ):
-        """Call when you have collected contact info."""
+        """Call when you have collected food preference fields."""
         self.complete(
-            ContactInfoResults(phone_number=phone_number, email_address=email_address)
+            FoodPreferenceResults(
+                preference_type=preference_type,
+                dietary_requirements=dietary_requirements,
+                special_notes=special_notes,
+            )
+        )
+
+
+class SupportServicesTask(AgentTask):
+    def __init__(self, agent_instructions: str, extra_tools: list | None = None):
+        super().__init__(
+            instructions=_build_task_instructions(
+                agent_instructions,
+                "- Collect required support services as a list, such as flight booking, airport transfer, visa assistance, travel insurance, hotel booking, or tour guide.\n- Also collect special assistance needs: senior support, kids support, and accessibility needs.",
+            ),
+            tools=list(extra_tools) if extra_tools else [],
+        )
+
+    async def on_enter(self):
+        await self.session.generate_reply(
+            instructions="Begin this task now.",
+            allow_interruptions=True,
+            tool_choice="auto",
+        )
+
+    @function_tool(name="record_support_services")
+    async def record_support_services(
+        self,
+        context: RunContext,
+        required_services: list[str],
+        senior_support: bool | None = None,
+        kids_support: bool | None = None,
+        accessibility: str | None = None,
+    ):
+        """Call when you have collected support service and assistance fields."""
+        self.complete(
+            SupportServicesResults(
+                required_services=required_services,
+                senior_support=senior_support,
+                kids_support=kids_support,
+                accessibility=accessibility,
+            )
         )

@@ -3,70 +3,185 @@ from __future__ import annotations
 from models.data_collection import (
     AccommodationPreferenceResults,
     ActivityPreferenceResults,
-    TravelPreferenceResults,
+    BudgetResults,
+    CustomerInfoResults,
+    FoodPreferenceResults,
+    LanguagePreferenceResults,
+    SupportServicesResults,
+    TravelPlanResults,
 )
-from utils.helpers import _to_json_serializable
+from utils.helpers import build_travel_lead_payload
 
 
-def test_travel_preference_serializes_structured_option_details():
-    result = TravelPreferenceResults(
-        transportation_mode="flight",
-        selected_option="Mumbai to Goa morning flight",
-        provider_name="IndiGo",
-        estimated_price="INR 6,500",
-        duration="one hour twenty minutes",
-        departure_time="08:30",
-        arrival_time="09:50",
-        notes="Client prefers fastest option.",
+def test_build_travel_lead_payload_matches_external_contract():
+    payload = build_travel_lead_payload(
+        {
+            "language_preference": LanguagePreferenceResults(
+                preferred_language="English",
+                language_code="en-US",
+            ),
+            "customer_info": CustomerInfoResults(
+                full_name="John Doe",
+                phone_number="70058949269",
+                email_address="john.doe@gmail.com",
+                total_travelers=10,
+            ),
+            "travel_plan": TravelPlanResults(
+                source="Mumbai",
+                destination="Doha",
+                destination_type="City & Culture",
+                start_date="2026-06-10",
+                end_date="2026-06-15",
+                flexible=True,
+                transportation_mode="flight",
+            ),
+            "budget": BudgetResults(
+                budget_type="Premium",
+                flexibility=True,
+                notes="User is open to optimized pricing",
+            ),
+            "accommodation": AccommodationPreferenceResults(
+                accommodation_type="five star resort",
+                hotel_rating="5-star",
+                room_type="family room or multiple rooms",
+                breakfast_included=True,
+                pool=True,
+                spa=True,
+                wifi=True,
+                kids_friendly=True,
+                near_attractions=True,
+                experience_expectation="luxury + comfort + scenic stay",
+                notes="Live availability to be checked",
+            ),
+            "activities": ActivityPreferenceResults(
+                interest_profile=["sightseeing", "culture", "nature", "relaxation"],
+            ),
+            "food_preferences": FoodPreferenceResults(
+                preference_type="Mix of Both",
+            ),
+            "support_services": SupportServicesResults(
+                required_services=[
+                    "flight_booking",
+                    "airport_transfer",
+                    "visa_assistance",
+                    "travel_insurance",
+                ],
+                senior_support=False,
+                kids_support=True,
+            ),
+        }
     )
 
-    assert _to_json_serializable(result) == {
-        "transportation_mode": "flight",
-        "selected_option": "Mumbai to Goa morning flight",
-        "provider_name": "IndiGo",
-        "estimated_price": "INR 6,500",
-        "duration": "one hour twenty minutes",
-        "departure_time": "08:30",
-        "arrival_time": "09:50",
-        "notes": "Client prefers fastest option.",
+    assert payload == {
+        "language_preference": {
+            "preferred_language": "English",
+            "language_code": "en-US",
+        },
+        "customer_info": {
+            "full_name": "John Doe",
+            "contact": {
+                "phone_number": "70058949269",
+                "email_address": "john.doe@gmail.com",
+            },
+            "travel_group": {
+                "total_travelers": 10,
+                "adults": None,
+                "kids": None,
+                "senior_citizens": None,
+            },
+        },
+        "travel_plan": {
+            "source": "Mumbai",
+            "destination": "Doha",
+            "destination_type": "City & Culture",
+            "travel_dates": {
+                "start_date": "2026-06-10",
+                "end_date": "2026-06-15",
+                "flexible": True,
+            },
+            "transportation_mode": "flight",
+        },
+        "budget": {
+            "budget_range": None,
+            "budget_type": "Premium",
+            "flexibility": True,
+            "notes": "User is open to optimized pricing",
+        },
+        "accommodation": {
+            "accommodation_type": "five star resort",
+            "hotel_rating": "5-star",
+            "room_type": "family room or multiple rooms",
+            "preferences": {
+                "breakfast_included": True,
+                "pool": True,
+                "spa": True,
+                "wifi": True,
+                "kids_friendly": True,
+                "near_attractions": True,
+            },
+            "experience_expectation": "luxury + comfort + scenic stay",
+            "estimated_price": None,
+            "notes": "Live availability to be checked",
+        },
+        "activities": {
+            "interest_profile": ["sightseeing", "culture", "nature", "relaxation"],
+        },
+        "food_preferences": {
+            "preference_type": "Mix of Both",
+            "dietary_requirements": None,
+            "special_notes": None,
+        },
+        "support_services": {
+            "required_services": [
+                "flight_booking",
+                "airport_transfer",
+                "visa_assistance",
+                "travel_insurance",
+            ],
+            "special_assistance": {
+                "senior_support": False,
+                "kids_support": True,
+                "accessibility": None,
+            },
+        },
     }
 
 
-def test_accommodation_serializes_client_hotel_preferences():
-    result = AccommodationPreferenceResults(
-        accommodation_type="five-star beach resort",
-        hotel_name="W Goa",
-        hotel_rating="five-star",
-        room_type="sea-view room",
-        location_preference="near Vagator Beach",
-        meal_plan="breakfast included",
-        amenities="pool, spa, beach access",
-        estimated_price="INR 22,000 per night",
-        notes="Client selected W Goa from realtime options.",
+def test_build_travel_lead_payload_preserves_schema_for_partial_results():
+    payload = build_travel_lead_payload(
+        {
+            "customer_info": CustomerInfoResults(
+                full_name="Jane Doe",
+                phone_number="12345",
+            )
+        }
     )
 
-    assert _to_json_serializable(result)["hotel_name"] == "W Goa"
-    assert _to_json_serializable(result)["hotel_rating"] == "five-star"
-    assert _to_json_serializable(result)["amenities"] == "pool, spa, beach access"
+    assert payload["customer_info"]["full_name"] == "Jane Doe"
+    assert payload["customer_info"]["contact"]["phone_number"] == "12345"
+    assert payload["travel_plan"]["source"] is None
+    assert payload["activities"]["interest_profile"] == []
+    assert payload["support_services"]["required_services"] == []
 
 
-def test_activity_serializes_selected_activity_details():
-    result = ActivityPreferenceResults(
-        activities="unique cultural activities",
-        selected_activity="private tour of a spice plantation",
-        activity_category="culture",
-        tour_type="private tour",
-        preferred_time="morning",
-        estimated_price="to be confirmed",
-        notes="Client does not want normal sightseeing.",
+def test_build_travel_lead_payload_localizes_arabic_language_label():
+    payload = build_travel_lead_payload(
+        {
+            "language_preference": LanguagePreferenceResults(
+                preferred_language="Arabic",
+                language_code="ar",
+            ),
+            "travel_plan": TravelPlanResults(
+                source="مومباي",
+                destination="الدوحة",
+                transportation_mode="رحلة طيران",
+            ),
+        }
     )
 
-    assert _to_json_serializable(result) == {
-        "activities": "unique cultural activities",
-        "selected_activity": "private tour of a spice plantation",
-        "activity_category": "culture",
-        "tour_type": "private tour",
-        "preferred_time": "morning",
-        "estimated_price": "to be confirmed",
-        "notes": "Client does not want normal sightseeing.",
+    assert payload["language_preference"] == {
+        "preferred_language": "العربية",
+        "language_code": "ar",
     }
+    assert payload["travel_plan"]["source"] == "مومباي"
+    assert payload["travel_plan"]["transportation_mode"] == "رحلة طيران"

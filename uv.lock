@@ -1288,7 +1288,7 @@ source = { editable = "." }
 dependencies = [
     { name = "elevenlabs" },
     { name = "google-generativeai" },
-    { name = "livekit-agents", extra = ["elevenlabs", "google", "openai", "silero", "turn-detector"] },
+    { name = "livekit-agents", extra = ["cartesia", "elevenlabs", "google", "groq", "openai", "silero", "turn-detector"] },
     { name = "livekit-plugins-ai-coustics" },
     { name = "livekit-plugins-deepgram" },
     { name = "livekit-plugins-noise-cancellation" },
@@ -1307,7 +1307,7 @@ dev = [
 requires-dist = [
     { name = "elevenlabs", specifier = ">=2.51.0" },
     { name = "google-generativeai", specifier = ">=0.8.6" },
-    { name = "livekit-agents", extras = ["elevenlabs", "google", "openai", "silero", "turn-detector"], specifier = "~=1.5" },
+    { name = "livekit-agents", extras = ["cartesia", "elevenlabs", "google", "groq", "openai", "silero", "turn-detector"], specifier = "~=1.5" },
     { name = "livekit-plugins-ai-coustics", specifier = "~=0.2" },
     { name = "livekit-plugins-deepgram", specifier = ">=1.5.15" },
     { name = "livekit-plugins-noise-cancellation", specifier = "~=0.2" },
@@ -1364,6 +1364,9 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+cartesia = [
+    { name = "livekit-plugins-cartesia" },
+]
 codecs = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -1373,6 +1376,9 @@ elevenlabs = [
 ]
 google = [
     { name = "livekit-plugins-google" },
+]
+groq = [
+    { name = "livekit-plugins-groq" },
 ]
 images = [
     { name = "pillow" },
@@ -1458,6 +1464,18 @@ wheels = [
 ]
 
 [[package]]
+name = "livekit-plugins-cartesia"
+version = "1.5.15"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "livekit-agents" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/07/64/d3cd1130e6e7170b659712f1b3522d989d328b6cdd7d05d7ba29398fdc44/livekit_plugins_cartesia-1.5.15.tar.gz", hash = "sha256:b59dfe4f60fdd856ee82b55cb4cf0ba38061ffb916bc260e0e32574c527aac51", size = 18196, upload-time = "2026-05-29T20:56:09.801Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/00/ad/cfd7b795752076f9cd80fd499eb2e9d68b8f3f0be4791deee605c3faefc9/livekit_plugins_cartesia-1.5.15-py3-none-any.whl", hash = "sha256:df0434ae6c2c5a90bc36db1c06072167da0836d1d6b92550d1af1ac277590704", size = 25538, upload-time = "2026-05-29T20:56:08.511Z" },
+]
+
+[[package]]
 name = "livekit-plugins-deepgram"
 version = "1.5.15"
 source = { registry = "https://pypi.org/simple" }
@@ -1497,6 +1515,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/27/d4/207e076a802321f7dd7fdc8f608b3d85abe2dc65e13678c4a56a4652e175/livekit_plugins_google-1.5.15.tar.gz", hash = "sha256:9a810cfd933c972157650428c4cc2e8e0e6f81670fd12eb3b3b7995964b63912", size = 45231, upload-time = "2026-05-29T20:56:26.447Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6b/7e/82a1471d6024ef24566c25bc267781254ced6b11775e9831b05fc8cea48e/livekit_plugins_google-1.5.15-py3-none-any.whl", hash = "sha256:d451a2ea514c2b52fcf13c0ef5e129cef8420e364d2bfd4f1edbb04fe8718817", size = 52859, upload-time = "2026-05-29T20:56:25.291Z" },
+]
+
+[[package]]
+name = "livekit-plugins-groq"
+version = "1.5.15"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "livekit" },
+    { name = "livekit-agents", extra = ["codecs", "openai"] },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4c/8c/87eea8462f4a92fa3957539fce5209097a573cb98811a490d60467ba274b/livekit_plugins_groq-1.5.15.tar.gz", hash = "sha256:69645c0611a0c238375caf3dafccc719e66d25457009488d0394f75a4e3f0c3d", size = 6132, upload-time = "2026-05-29T20:56:32.021Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b5/f0/b8ec64e2a286a57cc9239961e2071c6d0028e4a8b364a36f1c82fb73b1cb/livekit_plugins_groq-1.5.15-py3-none-any.whl", hash = "sha256:6c9d8869b08ea6bc3a754d286e1369a86b99e20940c1d08556ea8a983886553b", size = 7327, upload-time = "2026-05-29T20:56:30.942Z" },
 ]
 
 [[package]]

@@ -13,11 +13,7 @@ load_dotenv(".env")
 
 
 def _resolve_external_api_url() -> str:
-    return (
-        os.getenv("EXTERNAL_API_URL")
-        or os.getenv("EXTERNAL_API")
-        or ""
-    ).strip()
+    return (os.getenv("EXTERNAL_API_URL") or os.getenv("EXTERNAL_API") or "").strip()
 
 
 def send_to_external_api(payload: dict[str, Any], *, timeout: float = 10.0) -> None:
@@ -36,7 +32,7 @@ def send_to_external_api(payload: dict[str, Any], *, timeout: float = 10.0) -> N
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
-    body = json.dumps(payload).encode("utf-8")
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     req = request.Request(endpoint, data=body, headers=headers, method="POST")
 
     try:
@@ -44,5 +40,3 @@ def send_to_external_api(payload: dict[str, Any], *, timeout: float = 10.0) -> N
             resp.read()
     except error.URLError as exc:
         raise RuntimeError(f"failed to send payload to external API: {exc}") from exc
-
-

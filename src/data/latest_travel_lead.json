@@ -5,48 +5,64 @@
   },
   "customer_info": {
     "full_name": "John Doe",
-    "number_of_travelers": 4
+    "contact": {
+      "phone_number": "7058949269",
+      "email_address": "JohnDoe123@gmail.com"
+    },
+    "travel_group": {
+      "total_travelers": 5,
+      "adults": null,
+      "kids": 0,
+      "senior_citizens": null
+    }
   },
   "travel_plan": {
     "source": "Mumbai",
-    "destination": "Corsica",
-    "travel_dates": "15 July"
+    "destination": "Dubai",
+    "destination_type": "adventure",
+    "travel_dates": {
+      "start_date": null,
+      "end_date": null,
+      "flexible": true
+    },
+    "transportation_mode": "sea"
   },
   "budget": {
-    "budget": "15 lakhs"
-  },
-  "travel_preference": {
-    "transportation_mode": "flight",
-    "selected_option": null,
-    "provider_name": "Lufthansa",
-    "estimated_price": "$792 per passenger",
-    "duration": null,
-    "departure_time": null,
-    "arrival_time": null,
+    "budget_range": "50000 Rupees",
+    "budget_type": "Luxury",
+    "flexibility": true,
     "notes": null
   },
   "accommodation": {
-    "accommodation_type": "luxury hotel",
-    "hotel_name": "Hotel on Route de Palombaggia",
+    "accommodation_type": "hotel",
     "hotel_rating": null,
     "room_type": null,
-    "location_preference": "Porto-Vecchio",
-    "meal_plan": null,
-    "amenities": null,
+    "preferences": {
+      "breakfast_included": true,
+      "pool": false,
+      "spa": false,
+      "wifi": true,
+      "kids_friendly": true,
+      "near_attractions": true
+    },
+    "experience_expectation": null,
     "estimated_price": null,
-    "notes": "User confirmed to shortlist this luxury hotel."
+    "notes": null
   },
-  "activity": {
-    "activities": "sea kayaking",
-    "selected_activity": "sea kayaking",
-    "activity_category": "water activities",
-    "tour_type": "outdoor adventure",
-    "preferred_time": null,
-    "estimated_price": null,
-    "notes": "shortlisted for the group of four"
+  "activities": {
+    "interest_profile": []
   },
-  "contact_info": {
-    "phone_number": "7757939190",
-    "email_address": "johndoe@gmail.com"
+  "food_preferences": {
+    "preference_type": "No Preference",
+    "dietary_requirements": null,
+    "special_notes": null
+  },
+  "support_services": {
+    "required_services": [],
+    "special_assistance": {
+      "senior_support": false,
+      "kids_support": false,
+      "accessibility": null
+    }
   }
 }
