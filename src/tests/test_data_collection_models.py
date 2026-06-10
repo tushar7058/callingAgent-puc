@@ -69,10 +69,13 @@ def test_build_travel_lead_payload_matches_external_contract():
                 senior_support=False,
                 kids_support=True,
             ),
-        }
+        },
+        dateandtime="2026-06-10T12:34:56",
     )
 
     assert payload == {
+        "communication_mode": "Agent",
+        "Dateandtime": "2026-06-10T12:34:56",
         "language_preference": {
             "preferred_language": "English",
             "language_code": "en-US",
@@ -154,9 +157,12 @@ def test_build_travel_lead_payload_preserves_schema_for_partial_results():
                 full_name="Jane Doe",
                 phone_number="12345",
             )
-        }
+        },
+        dateandtime="2026-06-10T12:34:56",
     )
 
+    assert payload["communication_mode"] == "Agent"
+    assert payload["Dateandtime"] == "2026-06-10T12:34:56"
     assert payload["customer_info"]["full_name"] == "Jane Doe"
     assert payload["customer_info"]["contact"]["phone_number"] == "12345"
     assert payload["travel_plan"]["source"] is None
@@ -176,9 +182,12 @@ def test_build_travel_lead_payload_localizes_arabic_language_label():
                 destination="الدوحة",
                 transportation_mode="رحلة طيران",
             ),
-        }
+        },
+        dateandtime="2026-06-10T12:34:56",
     )
 
+    assert payload["communication_mode"] == "Agent"
+    assert payload["Dateandtime"] == "2026-06-10T12:34:56"
     assert payload["language_preference"] == {
         "preferred_language": "العربية",
         "language_code": "ar",

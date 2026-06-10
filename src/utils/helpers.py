@@ -1,4 +1,5 @@
 from dataclasses import asdict, is_dataclass
+from datetime import datetime
 
 
 def _to_json_serializable(obj):
@@ -26,9 +27,12 @@ def _language_label(language: dict) -> str:
     return preferred or "English"
 
 
-def build_travel_lead_payload(task_results: dict | None) -> dict:
+def build_travel_lead_payload(
+    task_results: dict | None, *, dateandtime: str | None = None
+) -> dict:
     """Build the external travel lead payload, preserving nulls for missing data."""
     task_results = task_results or {}
+    dateandtime = dateandtime or datetime.now().isoformat(timespec="seconds")
     language = _task_result(task_results, "language_preference")
     customer = _task_result(task_results, "customer_info")
     contact = _task_result(task_results, "contact_info")
@@ -42,6 +46,8 @@ def build_travel_lead_payload(task_results: dict | None) -> dict:
     support = _task_result(task_results, "support_services")
 
     return {
+        "communication_mode": "Agent",
+        "Dateandtime": dateandtime,
         "language_preference": {
             "preferred_language": _language_label(language),
             "language_code": language.get("language_code") or "en-US",
