@@ -1,4 +1,6 @@
 {
+  "communication_mode": "Agent",
+  "Dateandtime": "2026-06-10T11:24:38",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
@@ -7,43 +9,43 @@
     "full_name": "John Doe",
     "contact": {
       "phone_number": "7058949269",
-      "email_address": "JohnDoe123@gmail.com"
+      "email_address": "JohnDoe.123@gmail.com"
     },
     "travel_group": {
-      "total_travelers": 5,
+      "total_travelers": 10,
       "adults": null,
-      "kids": 0,
+      "kids": null,
       "senior_citizens": null
     }
   },
   "travel_plan": {
-    "source": "Mumbai",
-    "destination": "Dubai",
-    "destination_type": "adventure",
+    "source": null,
+    "destination": null,
+    "destination_type": null,
     "travel_dates": {
       "start_date": null,
       "end_date": null,
-      "flexible": true
+      "flexible": null
     },
-    "transportation_mode": "sea"
+    "transportation_mode": null
   },
   "budget": {
-    "budget_range": "50000 Rupees",
-    "budget_type": "Luxury",
-    "flexibility": true,
+    "budget_range": null,
+    "budget_type": null,
+    "flexibility": null,
     "notes": null
   },
   "accommodation": {
-    "accommodation_type": "hotel",
+    "accommodation_type": null,
     "hotel_rating": null,
     "room_type": null,
     "preferences": {
-      "breakfast_included": true,
-      "pool": false,
-      "spa": false,
-      "wifi": true,
-      "kids_friendly": true,
-      "near_attractions": true
+      "breakfast_included": null,
+      "pool": null,
+      "spa": null,
+      "wifi": null,
+      "kids_friendly": null,
+      "near_attractions": null
     },
     "experience_expectation": null,
     "estimated_price": null,
@@ -53,15 +55,15 @@
     "interest_profile": []
   },
   "food_preferences": {
-    "preference_type": "No Preference",
+    "preference_type": null,
     "dietary_requirements": null,
     "special_notes": null
   },
   "support_services": {
     "required_services": [],
     "special_assistance": {
-      "senior_support": false,
-      "kids_support": false,
+      "senior_support": null,
+      "kids_support": null,
       "accessibility": null
     }
   }

@@ -18,15 +18,18 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from agents.sales_agent import DefaultAgent
 from config.language_audio import build_stt, build_tts, resolve_language_profile
-
-logger = logging.getLogger("interview-agent")
+from utils.logging_config import setup_daily_file_logging
 
 load_dotenv(".env")
+setup_daily_file_logging()
+
+logger = logging.getLogger("interview-agent")
 
 
 def prewarm(proc: JobProcess):
     # Aggressively reduce silence duration so the AI responds faster when user stops speaking
     proc.userdata["vad"] = silero.VAD.load(min_silence_duration=0.4)
+    logger.info("agent prewarm complete: silero VAD loaded")
 
 
 def build_turn_handling_options(turn_detection=None) -> TurnHandlingOptions:
@@ -52,17 +55,23 @@ def build_turn_handling_options(turn_detection=None) -> TurnHandlingOptions:
 
 
 async def entrypoint(ctx: JobContext):
-    # ✅ CONNECT AGENT TO ROOM (MISSING STEP)
+    logger.info("agent job started")
+
     await ctx.connect()
-    print("✅ AGENT CONNECTED")
+    logger.info("agent connected to room")
 
     # Wait for the SIP caller to join the room
     participant = await ctx.wait_for_participant()
+    logger.info(
+        "participant joined: identity=%s kind=%s",
+        getattr(participant, "identity", "unknown"),
+        participant.kind,
+    )
 
     if participant.kind == rtc.ParticipantKind.PARTICIPANT_KIND_SIP:
         # Retrieve caller ID
         phone_number = participant.attributes.get("sip.phoneNumber", "unknown")
-        logger.info(f"SIP caller joined from number: {phone_number}")
+        logger.info("SIP caller joined from number: %s", phone_number)
 
     default_profile = resolve_language_profile("English")
 
@@ -94,6 +103,7 @@ async def entrypoint(ctx: JobContext):
     ctx.proc.userdata["dc_results"] = None
     ctx.proc.userdata["dc_task_results"] = {}
     ctx.proc.userdata["dc_external_sent"] = False
+    logger.info("agent session initialized; starting data collection agent")
     await session.start(
         agent=DefaultAgent(),
         room=ctx.room,
@@ -105,6 +115,7 @@ async def entrypoint(ctx: JobContext):
             ),
         ),
     )
+    logger.info("agent session started")
 
 
 if __name__ == "__main__":

@@ -80,16 +80,24 @@ You are interacting with a user via voice to collect travel lead information.
             return
 
         if userdata.get("dc_external_sent"):
+            logger.info("agent exiting: external lead payload already sent")
             return
 
         partial_results = userdata.get("dc_task_results")
         if partial_results:
+            logger.info(
+                "agent exiting with unsent partial task results: task_ids=%s",
+                sorted(partial_results.keys()),
+            )
             await self._persist_and_send_data_collection(
                 partial_results,
                 is_complete=False,
             )
+        else:
+            logger.info("agent exiting with no collected task results")
 
     async def on_enter(self):
+        logger.info("agent entered room; sending greeting")
         greeting_instructions = (
             "Welcome the caller bilingually. First say 'Welcome to Mannai Travels! I am AIRA, your AI travel assistant.' "
             "Then immediately say the Arabic equivalent (e.g., 'أهلاً بك في سفريات المناعي! أنا آيرا، مساعدك الذكي للسفر.')."
@@ -119,6 +127,11 @@ You are interacting with a user via voice to collect travel lead information.
             partial_results[task_event.task_id] = task_event.result
             get_job_context().proc.userdata["dc_results"] = build_travel_lead_payload(
                 partial_results
+            )
+            logger.info(
+                "data collection task completed: task_id=%s collected_task_count=%s",
+                task_event.task_id,
+                len(partial_results),
             )
 
             if task_event.task_id != "language_preference":
@@ -159,6 +172,7 @@ You are interacting with a user via voice to collect travel lead information.
         task_group = TaskGroup(
             chat_ctx=self.chat_ctx, on_task_completed=on_task_completed
         )
+        logger.info("data collection task group initialized")
 
         # 0. Language Preference
         task_group.add(
@@ -242,10 +256,12 @@ You are interacting with a user via voice to collect travel lead information.
             )
             return
 
+        logger.info("data collection task group completed")
         await self._finish_data_collection(group_result.task_results)
 
     async def _finish_data_collection(self, task_results):
         """Serialize results, save to JSON, speak goodbye, and end the session."""
+        logger.info("finalizing complete data collection payload")
         serialized = await self._persist_and_send_data_collection(
             task_results,
             is_complete=True,
@@ -272,6 +288,9 @@ You are interacting with a user via voice to collect travel lead information.
         await self._say_goodbye_and_end_call(preferred_language)
 
     async def _say_goodbye_and_end_call(self, preferred_language: str) -> None:
+        logger.info(
+            "saying final goodbye and ending call: language=%s", preferred_language
+        )
         goodbye_text = (
             "شكرًا لك، تم تسجيل التفاصيل. سيتواصل معك فريق سفريات المناعي قريبًا لمساعدتك في الخطوات التالية. نتمنى لك يومًا سعيدًا."
             if _is_arabic_language(preferred_language)
@@ -284,6 +303,7 @@ You are interacting with a user via voice to collect travel lead information.
         )
         try:
             await speech_handle
+            logger.info("final goodbye speech completed")
         except ConnectionError:
             logger.debug("user disconnected during goodbye speech")
 
@@ -303,6 +323,14 @@ You are interacting with a user via voice to collect travel lead information.
         serialized_results = _to_json_serializable(task_results)
         payload = build_travel_lead_payload(serialized_results)
         get_job_context().proc.userdata["dc_results"] = payload
+        status = "complete" if is_complete else "partial"
+        logger.info(
+            "persisting %s travel lead payload: task_ids=%s",
+            status,
+            sorted(serialized_results.keys())
+            if isinstance(serialized_results, dict)
+            else [],
+        )
 
         try:
             os.makedirs("src/data", exist_ok=True)
@@ -314,7 +342,6 @@ You are interacting with a user via voice to collect travel lead information.
 
         try:
             send_to_external_api(payload)
-            status = "complete" if is_complete else "partial"
             logger.info("Sent %s travel lead data to external API", status)
             get_job_context().proc.userdata["dc_external_sent"] = True
         except Exception as e:
