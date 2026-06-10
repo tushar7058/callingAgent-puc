@@ -1,7 +1,10 @@
+from importlib_metadata import md_none
+from operator import mod
+from socket import MSG_OOB
 from dataclasses import dataclass
 
 from livekit.agents import stt, tts
-from livekit.plugins import deepgram, elevenlabs, google
+from livekit.plugins import deepgram, elevenlabs, google , openai , cartesia
 
 
 @dataclass(frozen=True)
@@ -11,8 +14,10 @@ class LanguageProfile:
 
 
 DEFAULT_LANGUAGE_PROFILE = LanguageProfile(label="English", code="en-US")
+# ELEVENLABS_TTS_VOICE_ID = "IYUZs7LoFwd5QZsMgrMU" # priyanka sogam - voice
 ELEVENLABS_TTS_VOICE_ID = "Xb7hH8MSUJpSbSDYk0k2"
 GOOGLE_TTS_VOICE_NAME = "Sulafat"
+
 
 _LANGUAGE_ALIASES: dict[str, LanguageProfile] = {
     "english": LanguageProfile(label="English", code="en-US"),
@@ -50,21 +55,27 @@ def build_stt(profile: LanguageProfile):
 
     return stt.FallbackAdapter(
         [
+            openai.STT(
+                model="gpt-realtime-whisper",
+                # model="whisper-1",
+                language=profile.code,  
+                use_realtime=True,             
+            ),
+            deepgram.STT(
+                model="nova-3",
+                language=profile.code,
+                # detect_language=True,
+                interim_results=True,
+                punctuate=True,
+            ),
             google.STT(
-                model="latest_long",
+                model="telephony",
                 languages=languages,
                 detect_language=True,
                 spoken_punctuation=False,
                 punctuate=True,
                 interim_results=True,
                 location="global",
-            ),
-            deepgram.STT(
-                model="nova-3",
-                language=profile.code,
-                detect_language=True,
-                interim_results=True,
-                punctuate=True,
             ),
             elevenlabs.STT(
                 model_id="scribe_v2_realtime",
@@ -79,6 +90,16 @@ def build_stt(profile: LanguageProfile):
 
 def build_tts(profile: LanguageProfile):
     fallback_tts = [
+        cartesia.TTS(
+            model="sonic-3",
+            language=profile.code,
+            voice="f786b574-daa5-4673-aa0c-cbe3e8534c02"
+        ),
+        elevenlabs.TTS(
+            model="eleven_multilingual_v2",
+            voice_id=ELEVENLABS_TTS_VOICE_ID,
+            language=profile.code,
+        ),
         google.TTS(
             model_name="gemini-2.5-flash-lite-preview-tts",
             gender="female",
@@ -86,13 +107,11 @@ def build_tts(profile: LanguageProfile):
             language=profile.code,
             use_streaming=True,
         ),
-        elevenlabs.TTS(
-            model="eleven_turbo_v2_5",
-            voice_id=ELEVENLABS_TTS_VOICE_ID,
-            language=profile.code,
+        openai.TTS(
+            model="tts-1-hd",
+            voice="nova",
         ),
     ]
-
     if _is_english(profile):
         fallback_tts.append(deepgram.TTS(model="aura-2-asteria-en"))
 

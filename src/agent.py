@@ -48,7 +48,7 @@ def build_turn_handling_options(turn_detection=None) -> TurnHandlingOptions:
             "false_interruption_timeout": 1.5,
         },
         preemptive_generation={
-            "enabled": False,
+            "enabled": True,
             "preemptive_tts": False,
         },
     )

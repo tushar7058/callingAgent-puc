@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from types import SimpleNamespace
 
 from agents.sales_agent import DefaultAgent, _without_end_call_tools
@@ -123,3 +124,56 @@ async def test_finish_closeout_uses_arabic_goodbye(monkeypatch):
 
     assert session.calls[0][0] == "say"
     assert "شكرًا لك" in session.calls[0][1]
+
+
+def test_data_collection_task_group_disables_final_context_summary(monkeypatch):
+    captured = {}
+
+    class FakeTaskGroup:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+    callback = object()
+
+    monkeypatch.setattr("agents.sales_agent.TaskGroup", FakeTaskGroup)
+
+    task_group = DefaultAgent()._create_data_collection_task_group(callback)
+
+    assert isinstance(task_group, FakeTaskGroup)
+    assert captured["on_task_completed"] is callback
+    assert captured["summarize_chat_ctx"] is False
+
+
+async def test_finish_data_collection_speaks_before_waiting_for_external_send(
+    monkeypatch, tmp_path
+):
+    session = DummySession()
+    job_ctx = DummyJobContext()
+    events = []
+    send_can_finish = asyncio.Event()
+
+    async def fake_send_external(self, payload, status):
+        events.append(("send_started", status))
+        await send_can_finish.wait()
+        events.append(("send_finished", status))
+
+    def say(text, **kwargs):
+        events.append(("say", text))
+        send_can_finish.set()
+        return DummySpeechHandle(session.calls)
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(DefaultAgent, "session", property(lambda self: session))
+    monkeypatch.setattr("agents.sales_agent.get_job_context", lambda: job_ctx)
+    monkeypatch.setattr(
+        DefaultAgent, "_send_data_collection_external", fake_send_external
+    )
+    monkeypatch.setattr(session, "say", say)
+
+    await DefaultAgent()._finish_data_collection({})
+
+    event_names = [event[0] for event in events]
+
+    assert event_names.index("say") < event_names.index("send_finished")
+    assert ("send_finished", "complete") in events
+    assert ("shutdown", {"drain": False}) in session.calls

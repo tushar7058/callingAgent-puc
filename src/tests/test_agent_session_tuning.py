@@ -3,11 +3,11 @@ from __future__ import annotations
 from agent import build_turn_handling_options
 
 
-def test_turn_handling_disables_preemptive_generation_for_lower_jitter():
+def test_turn_handling_enables_preemptive_generation_for_lower_latency():
     options = build_turn_handling_options(turn_detection="vad")
 
     assert options["preemptive_generation"] == {
-        "enabled": False,
+        "enabled": True,
         "preemptive_tts": False,
     }
 

@@ -12,17 +12,46 @@ from models.data_collection import (
     TravelPlanResults,
 )
 
+TASK_START_INSTRUCTIONS = (
+    "Start the current data collection task immediately. Acknowledge any previous "
+    "answer in at most five words, then ask exactly one clear question for this "
+    "task. Do not recap, do not say goodbye, do not wait for the caller to ask "
+    "what is next, and do not mention internal task names or tools."
+)
+
 
 def _build_task_instructions(
-    agent_instructions: str, task_instructions: str, is_first: bool = False
+    agent_instructions: str,
+    task_instructions: str,
+    *,
+    first_question: str,
+    is_first: bool = False,
 ):
     prefix = (
         ""
         if is_first
         else "The user has already been greeted. Do not introduce yourself or say hello. Directly ask for the required information.\n"
     )
-    suffix = "\nIMPORTANT: Do NOT search live availability, recommend options, give prices, provide travel advice, say goodbye, recap the full conversation, or tell the user you are done. Only collect the information for THIS specific task. If the information was already provided earlier in the conversation, confirm it briefly and then record it immediately using the appropriate tool."
-    return prefix + agent_instructions + "\n" + task_instructions + suffix
+    first_question_instruction = (
+        f"\nWhen this task starts, ask exactly one question to begin: {first_question}"
+    )
+    suffix = "\nIMPORTANT: Do NOT search live availability, recommend options, give prices, provide travel advice, say goodbye, recap the full conversation, or tell the user you are done. Only collect the information for THIS specific task. As soon as all required details for this task are available, silently record them with the appropriate tool so the TaskGroup can immediately continue to the next task. If the information was already provided earlier in the conversation, confirm it briefly and then record it immediately using the appropriate tool."
+    return (
+        prefix
+        + agent_instructions
+        + "\n"
+        + task_instructions
+        + first_question_instruction
+        + suffix
+    )
+
+
+async def _start_task(session) -> None:
+    await session.generate_reply(
+        instructions=TASK_START_INSTRUCTIONS,
+        allow_interruptions=True,
+        tool_choice="auto",
+    )
 
 
 class CustomerInfoTask(AgentTask):
@@ -31,17 +60,13 @@ class CustomerInfoTask(AgentTask):
             instructions=_build_task_instructions(
                 agent_instructions,
                 "- Collect the customer's full name, phone number, email address, total travelers, and traveler split when available: adults, kids, and senior citizens.\n- If the user does not know the split, record the total and leave the split fields empty.",
-                is_first=True,
+                first_question="May I have your full name, phone number, email address, and how many travelers will be going?",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
 
     async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
+        await _start_task(self.session)
 
     @function_tool(name="record_customer_info")
     async def record_customer_info(
@@ -76,16 +101,13 @@ class LanguagePreferenceTask(AgentTask):
                 agent_instructions,
                 "- Ask which language the customer prefers for the conversation.\n- Offer only two options: English or Arabic.\n- IMPORTANT: Ask this question bilingually in both English and Arabic (e.g., 'Would you prefer to continue in English, or Arabic? هل تفضل الاستمرار باللغة الإنجليزية أم العربية؟').\n- Record the exact chosen option using the tool.",
                 is_first=False,
+                first_question="Would you prefer to continue in English, or Arabic? هل تفضل الاستمرار باللغة الإنجليزية أم العربية؟",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
 
     async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
+        await _start_task(self.session)
 
     @function_tool(name="record_language_preference")
     async def record_language_preference(
@@ -109,16 +131,13 @@ class TravelPlanTask(AgentTask):
             instructions=_build_task_instructions(
                 agent_instructions,
                 "- Collect the travel source, destination, destination type or trip style, start date, end date, whether dates are flexible, and preferred transportation mode.\n- Record dates as YYYY-MM-DD when the user provides exact dates. If dates are flexible, set flexible to true and leave unknown exact dates empty.",
+                first_question="Where will you be traveling from, and what destination are you planning to visit?",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
 
     async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
+        await _start_task(self.session)
 
     @function_tool(name="record_travel_plan")
     async def record_travel_plan(
@@ -152,16 +171,13 @@ class BudgetTask(AgentTask):
             instructions=_build_task_instructions(
                 agent_instructions,
                 "- Collect the budget range if available, budget type such as Economy, Standard, Premium, or Luxury, whether they are flexible, and any budget notes.",
+                first_question="What overall budget or budget type would you like us to plan around?",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
 
     async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
+        await _start_task(self.session)
 
     @function_tool(name="record_budget")
     async def record_budget(
@@ -189,16 +205,13 @@ class AccommodationTask(AgentTask):
             instructions=_build_task_instructions(
                 agent_instructions,
                 "- Collect accommodation type, hotel rating, room type, important preferences, experience expectation, estimated price if the user volunteers it, and notes.\n- For preferences, capture whether they want breakfast included, pool, spa, wifi, kids friendly property, and near attractions.\n- Do not suggest hotel names, search availability, or quote prices.",
+                first_question="What kind of accommodation would you prefer, such as hotel rating, room type, or must-have amenities?",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
 
     async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
+        await _start_task(self.session)
 
     @function_tool(name="record_accommodation")
     async def record_accommodation(
@@ -242,16 +255,13 @@ class ActivityTask(AgentTask):
             instructions=_build_task_instructions(
                 agent_instructions,
                 "- Collect the activity interest profile as a list, such as sightseeing, culture, nature, relaxation, adventure, shopping, or food.\n- Do not suggest activity names, search live availability, or quote ticket prices.",
+                first_question="What kinds of activities are you interested in during the trip?",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
 
     async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
+        await _start_task(self.session)
 
     @function_tool(name="record_activity")
     async def record_activity(
@@ -273,16 +283,13 @@ class FoodPreferenceTask(AgentTask):
             instructions=_build_task_instructions(
                 agent_instructions,
                 "- Collect food preference type, dietary requirements if any, and special food notes.\n- Preference type examples: Vegetarian, Non-Vegetarian, Mix of Both, Halal, Jain, or No Preference.",
+                first_question="Do you have any food preferences or dietary requirements we should note?",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
 
     async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
+        await _start_task(self.session)
 
     @function_tool(name="record_food_preferences")
     async def record_food_preferences(
@@ -308,16 +315,13 @@ class SupportServicesTask(AgentTask):
             instructions=_build_task_instructions(
                 agent_instructions,
                 "- Collect required support services as a list, such as flight booking, airport transfer, visa assistance, travel insurance, hotel booking, or tour guide.\n- Also collect special assistance needs: senior support, kids support, and accessibility needs.",
+                first_question="Which support services would you like, such as flights, transfers, visa help, insurance, hotel booking, or a tour guide?",
             ),
             tools=list(extra_tools) if extra_tools else [],
         )
 
     async def on_enter(self):
-        await self.session.generate_reply(
-            instructions="Begin this task now.",
-            allow_interruptions=True,
-            tool_choice="auto",
-        )
+        await _start_task(self.session)
 
     @function_tool(name="record_support_services")
     async def record_support_services(

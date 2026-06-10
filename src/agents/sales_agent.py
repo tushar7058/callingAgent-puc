@@ -169,9 +169,7 @@ You are interacting with a user via voice to collect travel lead information.
             return f"{self._agent_instructions}\n{language_line}\n{base_instructions}"
 
         _task_tools = _without_end_call_tools(self.tools)
-        task_group = TaskGroup(
-            chat_ctx=self.chat_ctx, on_task_completed=on_task_completed
-        )
+        task_group = self._create_data_collection_task_group(on_task_completed)
         logger.info("data collection task group initialized")
 
         # 0. Language Preference
@@ -259,12 +257,22 @@ You are interacting with a user via voice to collect travel lead information.
         logger.info("data collection task group completed")
         await self._finish_data_collection(group_result.task_results)
 
+    def _create_data_collection_task_group(self, on_task_completed):
+        return TaskGroup(
+            chat_ctx=self.chat_ctx,
+            on_task_completed=on_task_completed,
+            summarize_chat_ctx=False,
+        )
+
     async def _finish_data_collection(self, task_results):
         """Serialize results, save to JSON, speak goodbye, and end the session."""
         logger.info("finalizing complete data collection payload")
-        serialized = await self._persist_and_send_data_collection(
+        serialized = await self._persist_data_collection(
             task_results,
             is_complete=True,
+        )
+        external_send_task = asyncio.create_task(
+            self._send_data_collection_external(serialized, "complete")
         )
 
         preferred_language = (
@@ -285,9 +293,13 @@ You are interacting with a user via voice to collect travel lead information.
                 "language_code": preferred_language_code,
             }
 
-        await self._say_goodbye_and_end_call(preferred_language)
+        await self._say_goodbye_and_end_call(preferred_language, shutdown=False)
+        await external_send_task
+        self._shutdown_completed_job()
 
-    async def _say_goodbye_and_end_call(self, preferred_language: str) -> None:
+    async def _say_goodbye_and_end_call(
+        self, preferred_language: str, *, shutdown: bool = True
+    ) -> None:
         logger.info(
             "saying final goodbye and ending call: language=%s", preferred_language
         )
@@ -314,10 +326,26 @@ You are interacting with a user via voice to collect travel lead information.
         except Exception as e:
             logger.error("failed to delete room after data collection: %s", e)
 
+        if shutdown:
+            self._shutdown_completed_job()
+
+    def _shutdown_completed_job(self) -> None:
+        job_ctx = get_job_context()
         self.session.shutdown(drain=False)
         job_ctx.shutdown(reason="data_collection_complete")
 
     async def _persist_and_send_data_collection(
+        self, task_results, *, is_complete: bool
+    ) -> dict:
+        payload = await self._persist_data_collection(
+            task_results,
+            is_complete=is_complete,
+        )
+        status = "complete" if is_complete else "partial"
+        await self._send_data_collection_external(payload, status)
+        return payload
+
+    async def _persist_data_collection(
         self, task_results, *, is_complete: bool
     ) -> dict:
         serialized_results = _to_json_serializable(task_results)
@@ -340,11 +368,12 @@ You are interacting with a user via voice to collect travel lead information.
         except Exception as e:
             logger.error(f"Failed to save JSON: {e}")
 
+        return payload
+
+    async def _send_data_collection_external(self, payload: dict, status: str) -> None:
         try:
-            send_to_external_api(payload)
+            await asyncio.to_thread(send_to_external_api, payload)
             logger.info("Sent %s travel lead data to external API", status)
             get_job_context().proc.userdata["dc_external_sent"] = True
         except Exception as e:
             logger.error(f"Failed to send travel lead data to external API: {e}")
-
-        return payload

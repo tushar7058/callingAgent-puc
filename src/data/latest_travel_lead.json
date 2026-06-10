@@ -1,6 +1,6 @@
 {
   "communication_mode": "Agent",
-  "Dateandtime": "2026-06-10T11:24:38",
+  "Dateandtime": "2026-06-10T19:09:38",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
@@ -9,30 +9,30 @@
     "full_name": "John Doe",
     "contact": {
       "phone_number": "7058949269",
-      "email_address": "JohnDoe.123@gmail.com"
+      "email_address": "johndoe123@gmail.com"
     },
     "travel_group": {
-      "total_travelers": 10,
+      "total_travelers": 5,
       "adults": null,
       "kids": null,
       "senior_citizens": null
     }
   },
   "travel_plan": {
-    "source": null,
-    "destination": null,
-    "destination_type": null,
+    "source": "India",
+    "destination": "Dubai",
+    "destination_type": "adventure",
     "travel_dates": {
       "start_date": null,
       "end_date": null,
-      "flexible": null
+      "flexible": true
     },
-    "transportation_mode": null
+    "transportation_mode": "flight"
   },
   "budget": {
-    "budget_range": null,
+    "budget_range": "2 lakh rupees for five people",
     "budget_type": null,
-    "flexibility": null,
+    "flexibility": true,
     "notes": null
   },
   "accommodation": {
@@ -52,15 +52,19 @@
     "notes": null
   },
   "activities": {
-    "interest_profile": []
+    "interest_profile": [
+      "relaxation"
+    ]
   },
   "food_preferences": {
-    "preference_type": null,
+    "preference_type": "No Preference",
     "dietary_requirements": null,
     "special_notes": null
   },
   "support_services": {
-    "required_services": [],
+    "required_services": [
+      "hotel booking"
+    ],
     "special_assistance": {
       "senior_support": null,
       "kids_support": null,

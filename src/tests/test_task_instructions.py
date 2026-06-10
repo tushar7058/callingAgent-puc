@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from tasks.data_collection import AccommodationTask, ActivityTask, TravelPlanTask
+from tasks.data_collection import (
+    TASK_START_INSTRUCTIONS,
+    AccommodationTask,
+    ActivityTask,
+    CustomerInfoTask,
+    TravelPlanTask,
+)
 
 
 async def test_data_collection_tasks_do_not_recommend_or_search_live_options():
@@ -49,3 +55,25 @@ async def test_tasks_instruct_model_to_record_values_in_selected_language():
 
     assert "recorded user-facing JSON values" in task.instructions
     assert "numeric counts unchanged" in task.instructions
+
+
+async def test_task_transitions_start_immediately_and_advance_after_recording():
+    instructions = TravelPlanTask(agent_instructions="base").instructions
+
+    assert "When this task starts, ask exactly one question to begin:" in instructions
+    assert "Where will you be traveling from" in instructions
+    assert "silently record them with the appropriate tool" in instructions
+    assert "TaskGroup can immediately continue to the next task" in instructions
+
+    assert (
+        "Start the current data collection task immediately" in TASK_START_INSTRUCTIONS
+    )
+    assert "ask exactly one clear question" in TASK_START_INSTRUCTIONS
+    assert "do not wait for the caller to ask what is next" in TASK_START_INSTRUCTIONS
+
+
+async def test_customer_info_is_not_treated_as_initial_greeting_task():
+    instructions = CustomerInfoTask(agent_instructions="base").instructions
+
+    assert "The user has already been greeted" in instructions
+    assert "Do not introduce yourself or say hello" in instructions
