@@ -14,6 +14,11 @@ ENV PYTHONUNBUFFERED=1
 # expense of a slightly longer build.
 ENV UV_COMPILE_BYTECODE=1
 
+# Keep LiveKit/Silero/turn-detector model downloads inside /app so files
+# fetched during the build stage are copied into the final runtime image.
+ENV XDG_CACHE_HOME=/app/.cache
+ENV HF_HOME=/app/.cache/huggingface
+
 # Install uv into the base image. Both build and runtime stages inherit this.
 RUN pip install --no-cache-dir uv
 
@@ -52,7 +57,6 @@ RUN uv sync --locked
 COPY . .
 
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
-
 
 # Pre-download any ML models or files the agent needs
 # This ensures the container is ready to run immediately without downloading
