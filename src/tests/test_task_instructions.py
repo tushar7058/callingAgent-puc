@@ -83,6 +83,7 @@ async def test_task_transitions_start_immediately_and_advance_after_recording():
         "Start the current data collection task immediately" in TASK_START_INSTRUCTIONS
     )
     assert "ask exactly one clear question" in TASK_START_INSTRUCTIONS
+    assert "one short sentence" in TASK_START_INSTRUCTIONS
     assert "do not wait for the caller to ask what is next" in TASK_START_INSTRUCTIONS
 
 

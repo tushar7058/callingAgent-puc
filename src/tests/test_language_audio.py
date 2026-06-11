@@ -55,7 +55,7 @@ def test_build_stt_uses_deepgram_primary_with_google_fallback(
     )
 
 
-def test_build_tts_uses_cartesia_primary_with_provider_fallbacks_for_english(
+def test_build_tts_uses_fast_provider_fallbacks_for_english_by_default(
     monkeypatch,
 ):
     created = []
@@ -67,8 +67,6 @@ def test_build_tts_uses_cartesia_primary_with_provider_fallbacks_for_english(
 
         return create
 
-    monkeypatch.setenv("CARTESIA_TTS_MODEL", "sonic")
-    monkeypatch.setenv("CARTESIA_TTS_VOICE", "cartesia-voice")
     monkeypatch.setenv("ELEVENLABS_TTS_MODEL", "eleven_multilingual_v2")
     monkeypatch.setenv("GOOGLE_TTS_MODEL", "gemini-2.5-flash-lite-preview-tts")
     monkeypatch.setenv("OPENAI_TTS_MODEL", "gpt-4o-mini-tts")
@@ -86,7 +84,6 @@ def test_build_tts_uses_cartesia_primary_with_provider_fallbacks_for_english(
     fallback = build_tts(LanguageProfile(label="English", code="en-US"))
 
     assert fallback.instances == [
-        "cartesia",
         "elevenlabs",
         "google",
         "openai",
@@ -94,16 +91,6 @@ def test_build_tts_uses_cartesia_primary_with_provider_fallbacks_for_english(
     ]
     assert fallback.kwargs == {"max_retry_per_tts": 2}
     assert created[0] == (
-        "cartesia",
-        {
-            "model": "sonic",
-            "language": "en-US",
-            "voice": "cartesia-voice",
-            "speed": 1.0,
-            "emotion": "Excited",
-        },
-    )
-    assert created[1] == (
         "elevenlabs",
         {
             "model": "eleven_multilingual_v2",
@@ -111,7 +98,7 @@ def test_build_tts_uses_cartesia_primary_with_provider_fallbacks_for_english(
             "language": "en-US",
         },
     )
-    assert created[2] == (
+    assert created[1] == (
         "google",
         {
             "model_name": "gemini-2.5-flash-lite-preview-tts",
@@ -121,14 +108,54 @@ def test_build_tts_uses_cartesia_primary_with_provider_fallbacks_for_english(
             "use_streaming": True,
         },
     )
-    assert created[3] == (
+    assert created[2] == (
         "openai",
         {
             "model": "gpt-4o-mini-tts",
             "voice": "alloy",
         },
     )
-    assert created[4] == ("deepgram", {"model": "aura-2-asteria-en"})
+    assert created[3] == ("deepgram", {"model": "aura-2-asteria-en"})
+
+
+def test_build_tts_includes_cartesia_only_when_enabled(monkeypatch):
+    created = []
+
+    def recorder(provider):
+        def create(**kwargs):
+            created.append((provider, kwargs))
+            return provider
+
+        return create
+
+    monkeypatch.setenv("ENABLE_CARTESIA_TTS", "true")
+    monkeypatch.setenv("CARTESIA_TTS_MODEL", "sonic")
+    monkeypatch.setenv("CARTESIA_TTS_VOICE", "cartesia-voice")
+    monkeypatch.setenv("ELEVENLABS_TTS_MODEL", "eleven_multilingual_v2")
+    monkeypatch.setenv("GOOGLE_TTS_MODEL", "gemini-2.5-flash-lite-preview-tts")
+    monkeypatch.setenv("OPENAI_TTS_MODEL", "gpt-4o-mini-tts")
+    monkeypatch.setenv("OPENAI_TTS_VOICE", "alloy")
+    monkeypatch.setattr(language_audio, "ELEVENLABS_TTS_VOICE_ID", "eleven-voice")
+    monkeypatch.setattr(language_audio, "GOOGLE_TTS_VOICE_NAME", "Sulafat")
+    monkeypatch.setattr(language_audio.cartesia, "TTS", recorder("cartesia"))
+    monkeypatch.setattr(language_audio.google, "TTS", recorder("google"))
+    monkeypatch.setattr(language_audio.elevenlabs, "TTS", recorder("elevenlabs"))
+    monkeypatch.setattr(language_audio.openai, "TTS", recorder("openai"))
+    monkeypatch.setattr(language_audio.tts, "FallbackAdapter", _FallbackSpy)
+
+    fallback = build_tts(LanguageProfile(label="Arabic", code="ar"))
+
+    assert fallback.instances == ["elevenlabs", "google", "openai", "cartesia"]
+    assert created[-1] == (
+        "cartesia",
+        {
+            "model": "sonic",
+            "language": "ar",
+            "voice": "cartesia-voice",
+            "speed": 1.0,
+            "emotion": "Excited",
+        },
+    )
 
 
 def test_build_tts_skips_deepgram_tts_for_arabic(monkeypatch):
@@ -141,8 +168,6 @@ def test_build_tts_skips_deepgram_tts_for_arabic(monkeypatch):
 
         return create
 
-    monkeypatch.setenv("CARTESIA_TTS_MODEL", "sonic")
-    monkeypatch.setenv("CARTESIA_TTS_VOICE", "cartesia-voice")
     monkeypatch.setenv("ELEVENLABS_TTS_MODEL", "eleven_multilingual_v2")
     monkeypatch.setenv("GOOGLE_TTS_MODEL", "gemini-2.5-flash-lite-preview-tts")
     monkeypatch.setenv("OPENAI_TTS_MODEL", "gpt-4o-mini-tts")
@@ -158,9 +183,8 @@ def test_build_tts_skips_deepgram_tts_for_arabic(monkeypatch):
 
     fallback = build_tts(LanguageProfile(label="Arabic", code="ar"))
 
-    assert fallback.instances == ["cartesia", "elevenlabs", "google", "openai"]
+    assert fallback.instances == ["elevenlabs", "google", "openai"]
     assert [provider for provider, _ in created] == [
-        "cartesia",
         "elevenlabs",
         "google",
         "openai",

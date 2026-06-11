@@ -1,27 +1,27 @@
 {
   "communication_mode": "Agent",
-  "Dateandtime": "2026-06-11T17:32:58",
+  "Dateandtime": "2026-06-11T19:04:37",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
   },
   "customer_info": {
-    "full_name": "Alex",
+    "full_name": "Vaishnavi",
     "contact": {
-      "phone_number": "7058949269",
-      "email_address": "alex123@gmail.com"
+      "phone_number": "8421462161",
+      "email_address": "vaishnavi@gmail.com"
     },
     "travel_group": {
       "total_travelers": 3,
-      "adults": null,
-      "kids": null,
-      "senior_citizens": null
+      "adults": 2,
+      "kids": 1,
+      "senior_citizens": 0
     }
   },
   "travel_plan": {
     "source": "Mumbai",
-    "destination": "Doha",
-    "destination_type": "Business",
+    "destination": "South Korea",
+    "destination_type": "adventure",
     "travel_dates": {
       "start_date": null,
       "end_date": null,
@@ -30,22 +30,22 @@
     "transportation_mode": null
   },
   "budget": {
-    "budget_range": "50000",
+    "budget_range": "four lakhs",
     "budget_type": null,
-    "flexibility": true,
+    "flexibility": null,
     "notes": null
   },
   "accommodation": {
-    "accommodation_type": null,
-    "hotel_rating": null,
+    "accommodation_type": "luxury hotels",
+    "hotel_rating": "five star or seven star",
     "room_type": null,
     "preferences": {
-      "breakfast_included": null,
-      "pool": null,
-      "spa": null,
-      "wifi": null,
-      "kids_friendly": null,
-      "near_attractions": null
+      "breakfast_included": true,
+      "pool": true,
+      "spa": false,
+      "wifi": true,
+      "kids_friendly": true,
+      "near_attractions": false
     },
     "experience_expectation": null,
     "estimated_price": null,
@@ -53,7 +53,8 @@
   },
   "activities": {
     "interest_profile": [
-      "food"
+      "parties",
+      "clubs"
     ]
   },
   "food_preferences": {
@@ -63,11 +64,15 @@
   },
   "support_services": {
     "required_services": [
-      "tour guide"
+      "flight booking",
+      "airport transfer",
+      "visa assistance",
+      "travel insurance",
+      "hotel booking"
     ],
     "special_assistance": {
-      "senior_support": null,
-      "kids_support": null,
+      "senior_support": false,
+      "kids_support": false,
       "accessibility": null
     }
   }

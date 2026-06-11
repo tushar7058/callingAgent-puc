@@ -15,8 +15,9 @@ from models.data_collection import (
 TASK_START_INSTRUCTIONS = (
     "Start the current data collection task immediately. Acknowledge any previous "
     "answer in at most five words, then ask exactly one clear question for this "
-    "task. Do not recap, do not say goodbye, do not wait for the caller to ask "
-    "what is next, and do not mention internal task names or tools."
+    "task in one short sentence. Do not recap, do not say goodbye, do not wait "
+    "for the caller to ask what is next, and do not mention internal task names "
+    "or tools."
 )
 
 

@@ -61,6 +61,20 @@ def test_default_agent_intermediate_task_tools_exclude_end_call():
     assert all(tool.id != "end_call" for tool in _without_end_call_tools(agent.tools))
 
 
+def test_default_agent_forces_short_voice_responses():
+    instructions = DefaultAgent()._agent_instructions
+
+    assert "maximum one short sentence" in instructions
+    assert "Ask one question at a time" in instructions
+
+
+def test_task_agent_instructions_do_not_duplicate_base_prompt():
+    instructions = DefaultAgent()._build_task_agent_instructions("Arabic")
+
+    assert instructions.count("You are AIRA") == 1
+    assert "Use Arabic for this task" in instructions
+
+
 async def test_on_exit_sends_partial_data_when_call_cuts_mid_collection(
     monkeypatch, tmp_path
 ):

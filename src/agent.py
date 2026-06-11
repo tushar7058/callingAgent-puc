@@ -26,6 +26,31 @@ setup_daily_file_logging()
 logger = logging.getLogger("interview-agent")
 
 
+def build_llm():
+    return llm.FallbackAdapter(
+        [
+            openai.LLM(
+                model=os.getenv("OPENAI_MODEL"),
+                temperature=0,
+                max_completion_tokens=200,
+            ),
+            google.LLM(
+                model=os.getenv("GOOGLE_MODEL"),
+                vertexai=True,
+                credentials="key.json",
+                max_output_tokens=200,
+            ),
+            groq.LLM(
+                model=os.getenv("GROQ_MODEL"),
+                temperature=0,
+                api_key=os.getenv("GROQ_API_KEY"),
+                max_completion_tokens=200,
+            ),
+        ],
+        attempt_timeout=15.0,  # Gemini requires minimum 10s deadline; default 5s causes 400 errors
+    )
+
+
 def prewarm(proc: JobProcess):
     # Aggressively reduce silence duration so the AI responds faster when user stops speaking
     proc.userdata["vad"] = silero.VAD.load(min_silence_duration=0.4)
@@ -77,25 +102,7 @@ async def entrypoint(ctx: JobContext):
 
     session = AgentSession(
         stt=build_stt(default_profile),
-        llm=llm.FallbackAdapter(
-            [
-                openai.LLM(
-                    model=os.getenv("OPENAI_MODEL"),
-                    temperature=0,
-                ),
-                google.LLM(
-                    model=os.getenv("GOOGLE_MODEL"),
-                    vertexai=True,
-                    credentials="key.json",
-                ),
-                groq.LLM(
-                    model=os.getenv("GROQ_MODEL"),
-                    temperature=0,
-                    api_key=os.getenv("GROQ_API_KEY"),
-                ),
-            ],
-            attempt_timeout=15.0,  # Gemini requires minimum 10s deadline; default 5s causes 400 errors
-        ),
+        llm=build_llm(),
         tts=build_tts(default_profile),
         turn_handling=build_turn_handling_options(),
         vad=ctx.proc.userdata["vad"],
