@@ -1,10 +1,9 @@
 # syntax=docker/dockerfile:1
 
-# Use the official UV Python base image with Python 3.13 on Debian Bookworm
-# UV is a fast Python package manager that provides better performance than pip
-# We use the slim variant to keep the image size smaller while still having essential tools
+# Use the official Python image instead of the uv GHCR image so CI does not
+# depend on pulling from ghcr.io during Docker builds.
 ARG PYTHON_VERSION=3.13
-FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-bookworm-slim AS base
+FROM python:${PYTHON_VERSION}-slim-bookworm AS base
 
 # Keeps Python from buffering stdout and stderr to avoid situations where
 # the application crashes without emitting any logs due to buffering.
@@ -14,6 +13,9 @@ ENV PYTHONUNBUFFERED=1
 # doesn't pay the compilation cost. This reduces agent cold-start time at the
 # expense of a slightly longer build.
 ENV UV_COMPILE_BYTECODE=1
+
+# Install uv into the base image. Both build and runtime stages inherit this.
+RUN pip install --no-cache-dir uv
 
 # --- Build stage ---
 # Install dependencies, build native extensions, and prepare the application

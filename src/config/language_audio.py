@@ -1,13 +1,11 @@
-from importlib_metadata import md_none
-from operator import mod
-from socket import MSG_OOB
-from dataclasses import dataclass
 import os
-from dotenv import load_dotenv
-load_dotenv()
+from dataclasses import dataclass
 
+from dotenv import load_dotenv
 from livekit.agents import stt, tts
-from livekit.plugins import deepgram, elevenlabs, google , openai , cartesia
+from livekit.plugins import cartesia, deepgram, elevenlabs, google, openai
+
+load_dotenv()
 
 
 @dataclass(frozen=True)
@@ -59,8 +57,8 @@ def build_stt(profile: LanguageProfile):
         [
             openai.STT(
                 model=os.getenv("OPENAI_STT_MODEL"),
-                language=profile.code,  
-                use_realtime=True,             
+                language=profile.code,
+                use_realtime=True,
             ),
             deepgram.STT(
                 model=os.getenv("DEEPGRAM_STT_MODEL"),
@@ -95,7 +93,7 @@ def build_tts(profile: LanguageProfile):
             language=profile.code,
             voice=os.getenv("CARTESIA_TTS_VOICE"),
             speed=1.0,
-            emotion="Excited"
+            emotion="Excited",
         ),
         elevenlabs.TTS(
             model=os.getenv("ELEVENLABS_TTS_MODEL"),
