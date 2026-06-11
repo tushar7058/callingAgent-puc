@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-
   workflow_dispatch:
 
 concurrency:
@@ -82,16 +78,16 @@ jobs:
           fi
 
           sudo mkdir -p "$DEPLOY_DIR"
-          sudo chown "$(id -u):$(id -g)" "$DEPLOY_DIR"
-          sudo chown "$(id -u):$(id -g)" "$DEPLOY_DIR/key.json" 2>/dev/null || true
 
           umask 077
-          printf '%s\n' "$PRODUCTION_ENV_FILE" > "$DEPLOY_DIR/.env"
-          printf '%s\n' "$GOOGLE_SERVICE_ACCOUNT_JSON" > "$DEPLOY_DIR/key.json"
-          chmod 600 "$DEPLOY_DIR/.env"
+          env_tmp="$(mktemp)"
+          key_tmp="$(mktemp)"
+          printf '%s\n' "$PRODUCTION_ENV_FILE" > "$env_tmp"
+          printf '%s\n' "$GOOGLE_SERVICE_ACCOUNT_JSON" > "$key_tmp"
 
-          sudo chown 10001:10001 "$DEPLOY_DIR/key.json"
-          sudo chmod 400 "$DEPLOY_DIR/key.json"
+          sudo install -m 600 -o root -g root "$env_tmp" "$DEPLOY_DIR/.env"
+          sudo install -m 400 -o 10001 -g 10001 "$key_tmp" "$DEPLOY_DIR/key.json"
+          rm -f "$env_tmp" "$key_tmp"
 
           sudo -n docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 
