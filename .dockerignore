@@ -46,3 +46,17 @@ test/
 tests/
 eval/
 evals/
+
+
+.git
+__pycache__
+*.pyc
+.env
+venv/
+node_modules/
+*.log
+/Users/serii/ calling-agent/src/logs
+/Users/serii/ calling-agent/src/data
+src/data
+src/logs
+!key.json

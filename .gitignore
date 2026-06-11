@@ -31,3 +31,10 @@ KMS
 
 # GitHub CLI
 .github/personal-instructions.md
+key.json
+src/.livekit
+src/logs
+data/latest_travel_lead.json
+/Users/serii/ calling-agent/src/logs
+src/logs/2026-06-10.log
+.log

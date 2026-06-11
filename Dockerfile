@@ -49,6 +49,9 @@ RUN uv sync --locked
 # (Excludes files specified in .dockerignore)
 COPY . .
 
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
+
+
 # Pre-download any ML models or files the agent needs
 # This ensures the container is ready to run immediately without downloading
 # dependencies at runtime, which improves startup time and reliability

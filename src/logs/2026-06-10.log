@@ -1,0 +1,264 @@
+2026-06-10 11:14:19 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:14:19 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:14:19 | DEV | livekit.agents | Watching /Users/serii/ calling-agent/src
+2026-06-10 11:14:20 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:14:20 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:14:20 | INFO | livekit.agents | starting worker
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | plugin registered
+2026-06-10 11:14:20 | INFO | livekit.agents | starting inference executor
+2026-06-10 11:14:20 | INFO | livekit.agents | initializing process
+2026-06-10 11:14:24 | INFO | livekit.agents | process initialized
+2026-06-10 11:14:24 | INFO | livekit.agents | HTTP server listening on :51960
+2026-06-10 11:14:25 | INFO | livekit.agents | registered worker
+2026-06-10 11:14:34 | INFO | livekit.agents | received job request
+2026-06-10 11:14:34 | WARNING | livekit.agents | no warmed process available for job, waiting for one to be created
+2026-06-10 11:14:34 | INFO | livekit.agents | initializing process
+2026-06-10 11:14:36 | INFO | livekit.agents | process initialized
+2026-06-10 11:14:38 | INFO | interview-agent | SIP caller joined from number: +917058949269
+2026-06-10 11:14:38 | INFO | interview-agent | SIP caller joined from number: +917058949269
+2026-06-10 11:14:38 | WARNING | livekit.plugins.elevenlabs | both `use_realtime` and `model_id` parameters are provided. `use_realtime` will be ignored.
+2026-06-10 11:14:38 | WARNING | livekit.plugins.elevenlabs | both `use_realtime` and `model_id` parameters are provided. `use_realtime` will be ignored.
+2026-06-10 11:14:38 | INFO | google_genai._api_client | The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-06-10 11:14:38 | INFO | google_genai._api_client | The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-06-10 11:14:38 | INFO | livekit.agents | resampling livekit.plugins.elevenlabs.tts.TTS from 22050Hz to 24000Hz
+2026-06-10 11:14:38 | INFO | livekit.agents | resampling livekit.plugins.elevenlabs.tts.TTS from 22050Hz to 24000Hz
+2026-06-10 11:14:38 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:14:38 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:14:56 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:14:56 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:14:56 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:14:56 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:15:02 | WARNING | livekit.agents | _SegmentSynchronizerImpl.on_playback_started called after start_fut is set
+2026-06-10 11:15:02 | WARNING | livekit.agents | _SegmentSynchronizerImpl.on_playback_started called after start_fut is set
+2026-06-10 11:15:11 | WARNING | livekit.plugins.elevenlabs | both `use_realtime` and `model_id` parameters are provided. `use_realtime` will be ignored.
+2026-06-10 11:15:11 | INFO | livekit.agents | resampling livekit.plugins.elevenlabs.tts.TTS from 22050Hz to 24000Hz
+2026-06-10 11:15:11 | INFO | interview-agent | updated speech language: English (en-US)
+2026-06-10 11:15:11 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:15:11 | WARNING | livekit.plugins.elevenlabs | both `use_realtime` and `model_id` parameters are provided. `use_realtime` will be ignored.
+2026-06-10 11:15:11 | INFO | livekit.agents | resampling livekit.plugins.elevenlabs.tts.TTS from 22050Hz to 24000Hz
+2026-06-10 11:15:11 | INFO | interview-agent | updated speech language: English (en-US)
+2026-06-10 11:15:11 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:15:45 | INFO | livekit.agents | closing agent session due to participant disconnect (disable via `RoomInputOptions.close_on_disconnect=False`)
+2026-06-10 11:15:45 | INFO | livekit.agents | closing agent session due to participant disconnect (disable via `RoomInputOptions.close_on_disconnect=False`)
+2026-06-10 11:15:45 | INFO | interview-agent | data collection task group cancelled (participant likely disconnected)
+2026-06-10 11:15:45 | INFO | interview-agent | data collection task group cancelled (participant likely disconnected)
+2026-06-10 11:15:45 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:15:45 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:15:45 | ERROR | interview-agent | Failed to send travel lead data to external API: failed to send payload to external API: HTTP Error 404: Not Found
+2026-06-10 11:15:45 | ERROR | interview-agent | Failed to send travel lead data to external API: failed to send payload to external API: HTTP Error 404: Not Found
+2026-06-10 11:15:45 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:15:45 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:15:45 | ERROR | interview-agent | Failed to send travel lead data to external API: failed to send payload to external API: HTTP Error 404: Not Found
+2026-06-10 11:15:45 | ERROR | interview-agent | Failed to send travel lead data to external API: failed to send payload to external API: HTTP Error 404: Not Found
+2026-06-10 11:16:06 | WARNING | livekit | livekit_api::signal_client:530:livekit_api::signal_client - dropping pass-through signal — no stream available
+2026-06-10 11:16:06 | WARNING | livekit | livekit_api::signal_client:530:livekit_api::signal_client - dropping pass-through signal — no stream available
+2026-06-10 11:16:06 | INFO | livekit.agents | process exiting
+2026-06-10 11:16:06 | ERROR | asyncio | Task was destroyed but it is pending!
+task: <Task pending name='Task-49' coro=<Event.wait() running at /Users/serii/.local/share/uv/python/cpython-3.13.11-macos-aarch64-none/lib/python3.13/asyncio/locks.py:213> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2026-06-10 11:17:33 | INFO | livekit.agents | shutting down worker
+2026-06-10 11:17:33 | INFO | livekit.agents | process exiting
+2026-06-10 11:17:36 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:17:36 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:17:36 | INFO | livekit.agents | starting worker
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:36 | INFO | livekit.agents | starting inference executor
+2026-06-10 11:17:36 | INFO | livekit.agents | initializing process
+2026-06-10 11:17:39 | INFO | livekit.agents | process initialized
+2026-06-10 11:17:39 | INFO | livekit.agents | HTTP server listening on :52024
+2026-06-10 11:17:40 | INFO | livekit.agents | registered worker
+2026-06-10 11:17:53 | INFO | livekit.agents | shutting down worker
+2026-06-10 11:17:53 | INFO | livekit.agents | process exiting
+2026-06-10 11:17:55 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:17:55 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:17:55 | INFO | livekit.agents | starting worker
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | plugin registered
+2026-06-10 11:17:55 | INFO | livekit.agents | starting inference executor
+2026-06-10 11:17:55 | INFO | livekit.agents | initializing process
+2026-06-10 11:18:00 | INFO | livekit.agents | process initialized
+2026-06-10 11:18:00 | INFO | livekit.agents | HTTP server listening on :52049
+2026-06-10 11:18:00 | INFO | livekit.agents | shutting down worker
+2026-06-10 11:18:00 | INFO | livekit.agents | process exiting
+2026-06-10 11:18:02 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:18:02 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:18:02 | INFO | livekit.agents | starting worker
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:02 | INFO | livekit.agents | starting inference executor
+2026-06-10 11:18:02 | INFO | livekit.agents | initializing process
+2026-06-10 11:18:06 | INFO | livekit.agents | process initialized
+2026-06-10 11:18:06 | INFO | livekit.agents | HTTP server listening on :52061
+2026-06-10 11:18:06 | INFO | livekit.agents | shutting down worker
+2026-06-10 11:18:06 | INFO | livekit.agents | process exiting
+2026-06-10 11:18:08 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:18:08 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:18:08 | INFO | livekit.agents | starting worker
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:08 | INFO | livekit.agents | starting inference executor
+2026-06-10 11:18:08 | INFO | livekit.agents | initializing process
+2026-06-10 11:18:11 | INFO | livekit.agents | process initialized
+2026-06-10 11:18:11 | INFO | livekit.agents | HTTP server listening on :52066
+2026-06-10 11:18:12 | INFO | livekit.agents | registered worker
+2026-06-10 11:18:16 | INFO | livekit.agents | shutting down worker
+2026-06-10 11:18:16 | INFO | livekit.agents | process exiting
+2026-06-10 11:18:18 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:18:18 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:18:18 | INFO | livekit.agents | starting worker
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | plugin registered
+2026-06-10 11:18:18 | INFO | livekit.agents | starting inference executor
+2026-06-10 11:18:18 | INFO | livekit.agents | initializing process
+2026-06-10 11:18:21 | INFO | livekit.agents | process initialized
+2026-06-10 11:18:21 | INFO | livekit.agents | HTTP server listening on :52077
+2026-06-10 11:18:22 | INFO | livekit.agents | registered worker
+2026-06-10 11:18:30 | INFO | interview-agent | agent lifecycle event
+2026-06-10 11:18:30 | INFO | interview-agent | agent exiting with unsent partial task results: task_ids=['customer_info']
+2026-06-10 11:18:30 | INFO | interview-agent | persisting partial travel lead payload: task_ids=['customer_info']
+2026-06-10 11:18:30 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:18:30 | INFO | interview-agent | Sent partial travel lead data to external API
+2026-06-10 11:18:30 | INFO | interview-agent | saying final goodbye and ending call: language=English
+2026-06-10 11:18:30 | INFO | interview-agent | final goodbye speech completed
+2026-06-10 11:18:30 | INFO | interview-agent | deleted room after data collection completed
+2026-06-10 11:18:30 | INFO | interview-agent | saying final goodbye and ending call: language=Arabic
+2026-06-10 11:18:30 | INFO | interview-agent | final goodbye speech completed
+2026-06-10 11:18:30 | INFO | interview-agent | deleted room after data collection completed
+2026-06-10 11:21:58 | INFO | livekit.agents | shutting down worker
+2026-06-10 11:21:58 | INFO | livekit.agents | process exiting
+2026-06-10 11:22:02 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:22:02 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:22:02 | DEV | livekit.agents | Watching /Users/serii/ calling-agent/src
+2026-06-10 11:22:03 | INFO | livekit | livekit_ffi::server:153:livekit_ffi::server - initializing ffi server v0.12.56
+2026-06-10 11:22:03 | INFO | livekit | livekit_ffi::cabi:50:livekit_ffi::cabi - initializing ffi server v0.12.56
+2026-06-10 11:22:03 | INFO | livekit.agents | starting worker
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | plugin registered
+2026-06-10 11:22:03 | INFO | livekit.agents | starting inference executor
+2026-06-10 11:22:03 | INFO | livekit.agents | initializing process
+2026-06-10 11:22:07 | INFO | livekit.agents | process initialized
+2026-06-10 11:22:07 | INFO | livekit.agents | HTTP server listening on :52125
+2026-06-10 11:22:11 | INFO | livekit.agents | registered worker
+2026-06-10 11:22:11 | INFO | livekit.agents | received job request
+2026-06-10 11:22:11 | WARNING | livekit.agents | no warmed process available for job, waiting for one to be created
+2026-06-10 11:22:11 | INFO | livekit.agents | initializing process
+2026-06-10 11:22:13 | INFO | interview-agent | agent prewarm complete: silero VAD loaded
+2026-06-10 11:22:13 | INFO | interview-agent | agent prewarm complete: silero VAD loaded
+2026-06-10 11:22:13 | INFO | livekit.agents | process initialized
+2026-06-10 11:22:13 | INFO | interview-agent | agent job started
+2026-06-10 11:22:13 | INFO | interview-agent | agent job started
+2026-06-10 11:22:14 | INFO | interview-agent | agent connected to room
+2026-06-10 11:22:14 | INFO | interview-agent | participant joined: identity=sip_+917058949269 kind=3
+2026-06-10 11:22:14 | INFO | interview-agent | SIP caller joined from number: +917058949269
+2026-06-10 11:22:14 | INFO | interview-agent | agent connected to room
+2026-06-10 11:22:14 | INFO | interview-agent | participant joined: identity=sip_+917058949269 kind=3
+2026-06-10 11:22:14 | INFO | interview-agent | SIP caller joined from number: +917058949269
+2026-06-10 11:22:14 | WARNING | livekit.plugins.elevenlabs | both `use_realtime` and `model_id` parameters are provided. `use_realtime` will be ignored.
+2026-06-10 11:22:14 | WARNING | livekit.plugins.elevenlabs | both `use_realtime` and `model_id` parameters are provided. `use_realtime` will be ignored.
+2026-06-10 11:22:14 | INFO | google_genai._api_client | The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-06-10 11:22:14 | INFO | google_genai._api_client | The user provided project/location will take precedence over the Vertex AI API key from the environment variable.
+2026-06-10 11:22:14 | INFO | livekit.agents | resampling livekit.plugins.elevenlabs.tts.TTS from 22050Hz to 24000Hz
+2026-06-10 11:22:14 | INFO | livekit.agents | resampling livekit.plugins.elevenlabs.tts.TTS from 22050Hz to 24000Hz
+2026-06-10 11:22:14 | INFO | interview-agent | agent session initialized; starting data collection agent
+2026-06-10 11:22:14 | INFO | interview-agent | agent session initialized; starting data collection agent
+2026-06-10 11:22:14 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:22:14 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:22:14 | INFO | interview-agent | agent entered room; sending greeting
+2026-06-10 11:22:14 | INFO | interview-agent | agent entered room; sending greeting
+2026-06-10 11:22:14 | INFO | interview-agent | agent session started
+2026-06-10 11:22:14 | INFO | interview-agent | agent session started
+2026-06-10 11:22:33 | INFO | interview-agent | data collection task group initialized
+2026-06-10 11:22:33 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:22:33 | INFO | interview-agent | data collection task group initialized
+2026-06-10 11:22:33 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:22:33 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:22:33 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:22:49 | WARNING | livekit.plugins.silero | inference is slower than realtime
+2026-06-10 11:22:49 | WARNING | livekit.plugins.silero | inference is slower than realtime
+2026-06-10 11:22:50 | INFO | interview-agent | data collection task completed: task_id=language_preference collected_task_count=1
+2026-06-10 11:22:50 | INFO | interview-agent | data collection task completed: task_id=language_preference collected_task_count=1
+2026-06-10 11:22:50 | WARNING | livekit.plugins.elevenlabs | both `use_realtime` and `model_id` parameters are provided. `use_realtime` will be ignored.
+2026-06-10 11:22:50 | INFO | livekit.agents | resampling livekit.plugins.elevenlabs.tts.TTS from 22050Hz to 24000Hz
+2026-06-10 11:22:50 | INFO | interview-agent | updated speech language: English (en-US)
+2026-06-10 11:22:50 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:22:50 | WARNING | livekit.plugins.elevenlabs | both `use_realtime` and `model_id` parameters are provided. `use_realtime` will be ignored.
+2026-06-10 11:22:50 | INFO | livekit.agents | resampling livekit.plugins.elevenlabs.tts.TTS from 22050Hz to 24000Hz
+2026-06-10 11:22:50 | INFO | interview-agent | updated speech language: English (en-US)
+2026-06-10 11:22:50 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:23:57 | INFO | interview-agent | data collection task completed: task_id=customer_info collected_task_count=2
+2026-06-10 11:23:57 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:23:57 | INFO | interview-agent | data collection task completed: task_id=customer_info collected_task_count=2
+2026-06-10 11:23:57 | WARNING | livekit.agents | interruption_detection is provided, but it's not compatible with the current configuration and will be disabled
+2026-06-10 11:24:37 | INFO | livekit.agents | closing agent session due to participant disconnect (disable via `RoomInputOptions.close_on_disconnect=False`)
+2026-06-10 11:24:37 | INFO | livekit.agents | closing agent session due to participant disconnect (disable via `RoomInputOptions.close_on_disconnect=False`)
+2026-06-10 11:24:37 | INFO | interview-agent | data collection task group cancelled (participant likely disconnected)
+2026-06-10 11:24:37 | INFO | interview-agent | persisting partial travel lead payload: task_ids=['customer_info', 'language_preference']
+2026-06-10 11:24:37 | INFO | interview-agent | data collection task group cancelled (participant likely disconnected)
+2026-06-10 11:24:37 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:24:37 | INFO | interview-agent | persisting partial travel lead payload: task_ids=['customer_info', 'language_preference']
+2026-06-10 11:24:37 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:24:38 | ERROR | interview-agent | Failed to send travel lead data to external API: failed to send payload to external API: HTTP Error 404: Not Found
+2026-06-10 11:24:38 | ERROR | interview-agent | Failed to send travel lead data to external API: failed to send payload to external API: HTTP Error 404: Not Found
+2026-06-10 11:24:38 | INFO | interview-agent | agent exiting with unsent partial task results: task_ids=['customer_info', 'language_preference']
+2026-06-10 11:24:38 | INFO | interview-agent | persisting partial travel lead payload: task_ids=['customer_info', 'language_preference']
+2026-06-10 11:24:38 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:24:38 | INFO | interview-agent | agent exiting with unsent partial task results: task_ids=['customer_info', 'language_preference']
+2026-06-10 11:24:38 | INFO | interview-agent | persisting partial travel lead payload: task_ids=['customer_info', 'language_preference']
+2026-06-10 11:24:38 | INFO | interview-agent | Saved travel lead data to src/data/latest_travel_lead.json
+2026-06-10 11:24:38 | ERROR | interview-agent | Failed to send travel lead data to external API: failed to send payload to external API: HTTP Error 404: Not Found
+2026-06-10 11:24:38 | ERROR | interview-agent | Failed to send travel lead data to external API: failed to send payload to external API: HTTP Error 404: Not Found
+2026-06-10 11:25:00 | WARNING | livekit | livekit_api::signal_client:530:livekit_api::signal_client - dropping pass-through signal — no stream available
+2026-06-10 11:25:00 | WARNING | livekit | livekit_api::signal_client:530:livekit_api::signal_client - dropping pass-through signal — no stream available
+2026-06-10 11:25:00 | INFO | livekit.agents | process exiting
+2026-06-10 11:25:00 | ERROR | asyncio | Task was destroyed but it is pending!
+task: <Task pending name='Task-47' coro=<Event.wait() running at /Users/serii/.local/share/uv/python/cpython-3.13.11-macos-aarch64-none/lib/python3.13/asyncio/locks.py:213> wait_for=<Future pending cb=[Task.task_wakeup()]>>

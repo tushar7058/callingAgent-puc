@@ -1,0 +1,72 @@
+{
+  "communication_mode": "Agent",
+  "Dateandtime": "2026-06-11T11:50:53",
+  "language_preference": {
+    "preferred_language": "English",
+    "language_code": "en-US"
+  },
+  "customer_info": {
+    "full_name": "John Doe",
+    "contact": {
+      "phone_number": "7058949269",
+      "email_address": "Johndoe816@gmail.com"
+    },
+    "travel_group": {
+      "total_travelers": 2,
+      "adults": null,
+      "kids": null,
+      "senior_citizens": null
+    }
+  },
+  "travel_plan": {
+    "source": "Mumbai",
+    "destination": "Goa",
+    "destination_type": "adventure",
+    "travel_dates": {
+      "start_date": "2024-07-15",
+      "end_date": "2024-07-30",
+      "flexible": false
+    },
+    "transportation_mode": "flight"
+  },
+  "budget": {
+    "budget_range": "thirty thousand",
+    "budget_type": null,
+    "flexibility": false,
+    "notes": "Budget is for two people only"
+  },
+  "accommodation": {
+    "accommodation_type": null,
+    "hotel_rating": null,
+    "room_type": null,
+    "preferences": {
+      "breakfast_included": null,
+      "pool": true,
+      "spa": null,
+      "wifi": true,
+      "kids_friendly": null,
+      "near_attractions": null
+    },
+    "experience_expectation": null,
+    "estimated_price": "30000",
+    "notes": null
+  },
+  "activities": {
+    "interest_profile": []
+  },
+  "food_preferences": {
+    "preference_type": "No Preference",
+    "dietary_requirements": null,
+    "special_notes": null
+  },
+  "support_services": {
+    "required_services": [
+      "tour guide"
+    ],
+    "special_assistance": {
+      "senior_support": null,
+      "kids_support": null,
+      "accessibility": null
+    }
+  }
+}
