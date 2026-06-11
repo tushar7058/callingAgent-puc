@@ -10,7 +10,7 @@ class _FallbackSpy:
         self.kwargs = kwargs
 
 
-def test_build_stt_uses_openai_primary_with_deepgram_google_and_elevenlabs_fallbacks(
+def test_build_stt_uses_deepgram_primary_with_google_fallback(
     monkeypatch,
 ):
     created = []
@@ -22,29 +22,17 @@ def test_build_stt_uses_openai_primary_with_deepgram_google_and_elevenlabs_fallb
 
         return create
 
-    monkeypatch.setenv("OPENAI_STT_MODEL", "gpt-4o-mini-transcribe")
     monkeypatch.setenv("DEEPGRAM_STT_MODEL", "nova-3")
     monkeypatch.setenv("GOOGLE_STT_MODEL", "telephony")
-    monkeypatch.setenv("ELEVENLABS_STT_MODEL", "scribe_v2_realtime")
-    monkeypatch.setattr(language_audio.openai, "STT", recorder("openai"))
     monkeypatch.setattr(language_audio.google, "STT", recorder("google"))
     monkeypatch.setattr(language_audio.deepgram, "STT", recorder("deepgram"))
-    monkeypatch.setattr(language_audio.elevenlabs, "STT", recorder("elevenlabs"))
     monkeypatch.setattr(language_audio.stt, "FallbackAdapter", _FallbackSpy)
 
     fallback = build_stt(LanguageProfile(label="Arabic", code="ar"))
 
-    assert fallback.instances == ["openai", "deepgram", "google", "elevenlabs"]
+    assert fallback.instances == ["deepgram", "google"]
     assert fallback.kwargs == {"attempt_timeout": 10.0, "max_retry_per_stt": 1}
     assert created[0] == (
-        "openai",
-        {
-            "model": "gpt-4o-mini-transcribe",
-            "language": "ar",
-            "use_realtime": True,
-        },
-    )
-    assert created[1] == (
         "deepgram",
         {
             "model": "nova-3",
@@ -53,7 +41,7 @@ def test_build_stt_uses_openai_primary_with_deepgram_google_and_elevenlabs_fallb
             "punctuate": True,
         },
     )
-    assert created[2] == (
+    assert created[1] == (
         "google",
         {
             "model": "telephony",
@@ -63,14 +51,6 @@ def test_build_stt_uses_openai_primary_with_deepgram_google_and_elevenlabs_fallb
             "punctuate": True,
             "interim_results": True,
             "location": "global",
-        },
-    )
-    assert created[3] == (
-        "elevenlabs",
-        {
-            "model_id": "scribe_v2_realtime",
-            "language_code": "ar",
-            "use_realtime": True,
         },
     )
 

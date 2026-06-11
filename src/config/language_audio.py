@@ -55,11 +55,6 @@ def build_stt(profile: LanguageProfile):
 
     return stt.FallbackAdapter(
         [
-            openai.STT(
-                model=os.getenv("OPENAI_STT_MODEL"),
-                language=profile.code,
-                use_realtime=True,
-            ),
             deepgram.STT(
                 model=os.getenv("DEEPGRAM_STT_MODEL"),
                 language=profile.code,
@@ -74,11 +69,6 @@ def build_stt(profile: LanguageProfile):
                 punctuate=True,
                 interim_results=True,
                 location="global",
-            ),
-            elevenlabs.STT(
-                model_id=os.getenv("ELEVENLABS_STT_MODEL"),
-                language_code=profile.code,
-                use_realtime=True,
             ),
         ],
         attempt_timeout=10.0,
