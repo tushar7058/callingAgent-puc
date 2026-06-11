@@ -37,19 +37,19 @@ def build_turn_handling_options(turn_detection=None) -> TurnHandlingOptions:
         turn_detection=turn_detection or MultilingualModel(),
         endpointing={
             "mode": "fixed",
-            "min_delay": 0.35,
+            "min_delay": 0.5,
             "max_delay": 2.0,
         },
         interruption={
-            "mode": "adaptive",
-            "min_duration": 0.35,
-            "min_words": 0,
             "resume_false_interruption": True,
             "false_interruption_timeout": 1.5,
         },
         preemptive_generation={
             "enabled": True,
             "preemptive_tts": False,
+        },
+        user_turn_limit={
+            "max_duration": 30.0,
         },
     )
 
