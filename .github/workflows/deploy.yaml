@@ -102,6 +102,18 @@ jobs:
             --volume "$DEPLOY_DIR/key.json:/app/key.json:ro" \
             "${IMAGE_NAME}:${GITHUB_SHA}"
 
+          echo "Started container: ${CONTAINER_NAME}"
+          sleep 5
+          sudo -n docker ps -a --filter "name=${CONTAINER_NAME}"
+
+          if [ "$(sudo -n docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME")" != "true" ]; then
+            echo "Container ${CONTAINER_NAME} is not running. Last logs:"
+            sudo -n docker logs --tail 200 "$CONTAINER_NAME" || true
+            exit 1
+          fi
+
       - name: Show deployment status
         if: github.event_name != 'pull_request'
-        run: sudo -n docker ps --filter "name=${CONTAINER_NAME}"
+        run: |
+          sudo -n docker ps -a --filter "name=${CONTAINER_NAME}"
+          sudo -n docker logs --tail 50 "$CONTAINER_NAME"
