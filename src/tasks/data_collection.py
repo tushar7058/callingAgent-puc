@@ -130,7 +130,7 @@ class TravelPlanTask(AgentTask):
         super().__init__(
             instructions=_build_task_instructions(
                 agent_instructions,
-                "- Collect the travel source, destination, destination type or trip style, start date, end date, whether dates are flexible, and preferred transportation mode.\n- Record dates as YYYY-MM-DD when the user provides exact dates. If dates are flexible, set flexible to true and leave unknown exact dates empty.",
+                "- Collect the travel source, destination, destination type or trip style, start date, end date, and whether dates are flexible.\n- Only ask transportation mode for domestic or same-country trips. Do not ask for transportation mode for international trips; leave transportation_mode empty unless the caller volunteers it.\n- Record dates as YYYY-MM-DD when the user provides exact dates. If dates are flexible, set flexible to true and leave unknown exact dates empty.",
                 first_question="Where will you be traveling from, and what destination are you planning to visit?",
             ),
             tools=list(extra_tools) if extra_tools else [],

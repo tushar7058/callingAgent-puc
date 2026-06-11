@@ -1,6 +1,6 @@
 {
   "communication_mode": "Agent",
-  "Dateandtime": "2026-06-10T19:09:38",
+  "Dateandtime": "2026-06-11T11:50:53",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
@@ -9,31 +9,31 @@
     "full_name": "John Doe",
     "contact": {
       "phone_number": "7058949269",
-      "email_address": "johndoe123@gmail.com"
+      "email_address": "Johndoe816@gmail.com"
     },
     "travel_group": {
-      "total_travelers": 5,
+      "total_travelers": 2,
       "adults": null,
       "kids": null,
       "senior_citizens": null
     }
   },
   "travel_plan": {
-    "source": "India",
-    "destination": "Dubai",
+    "source": "Mumbai",
+    "destination": "Goa",
     "destination_type": "adventure",
     "travel_dates": {
-      "start_date": null,
-      "end_date": null,
-      "flexible": true
+      "start_date": "2024-07-15",
+      "end_date": "2024-07-30",
+      "flexible": false
     },
     "transportation_mode": "flight"
   },
   "budget": {
-    "budget_range": "2 lakh rupees for five people",
+    "budget_range": "thirty thousand",
     "budget_type": null,
-    "flexibility": true,
-    "notes": null
+    "flexibility": false,
+    "notes": "Budget is for two people only"
   },
   "accommodation": {
     "accommodation_type": null,
@@ -41,20 +41,18 @@
     "room_type": null,
     "preferences": {
       "breakfast_included": null,
-      "pool": null,
+      "pool": true,
       "spa": null,
-      "wifi": null,
+      "wifi": true,
       "kids_friendly": null,
       "near_attractions": null
     },
     "experience_expectation": null,
-    "estimated_price": null,
+    "estimated_price": "30000",
     "notes": null
   },
   "activities": {
-    "interest_profile": [
-      "relaxation"
-    ]
+    "interest_profile": []
   },
   "food_preferences": {
     "preference_type": "No Preference",
@@ -63,7 +61,7 @@
   },
   "support_services": {
     "required_services": [
-      "hotel booking"
+      "tour guide"
     ],
     "special_assistance": {
       "senior_support": null,

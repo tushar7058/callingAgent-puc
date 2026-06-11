@@ -43,6 +43,20 @@ async def test_tasks_collect_target_schema_fields():
     assert "interest profile" in activity_instructions
 
 
+async def test_travel_plan_skips_transportation_mode_for_international_trips():
+    instructions = TravelPlanTask(agent_instructions="base").instructions
+
+    assert "Do not ask for transportation mode for international trips" in instructions
+    assert (
+        "leave transportation_mode empty unless the caller volunteers it"
+        in instructions
+    )
+    assert (
+        "Only ask transportation mode for domestic or same-country trips"
+        in instructions
+    )
+
+
 async def test_tasks_instruct_model_to_record_values_in_selected_language():
     task = TravelPlanTask(
         agent_instructions=(
