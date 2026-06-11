@@ -86,7 +86,8 @@ async def entrypoint(ctx: JobContext):
                 google.LLM(
                     model=os.getenv("GOOGLE_MODEL"),
                     vertexai=True,
-                    credentials="key.json"),
+                    credentials="key.json",
+                ),
                 groq.LLM(
                     model=os.getenv("GROQ_MODEL"),
                     temperature=0,
