@@ -1,50 +1,50 @@
 {
   "communication_mode": "Agent",
-  "Dateandtime": "2026-06-11T19:04:37",
+  "Dateandtime": "2026-06-12T14:16:48",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
   },
   "customer_info": {
-    "full_name": "Vaishnavi",
+    "full_name": "Alex",
     "contact": {
-      "phone_number": "8421462161",
-      "email_address": "vaishnavi@gmail.com"
+      "phone_number": "7058949269",
+      "email_address": "alex123@gmail.com"
     },
     "travel_group": {
       "total_travelers": 3,
-      "adults": 2,
-      "kids": 1,
-      "senior_citizens": 0
+      "adults": null,
+      "kids": null,
+      "senior_citizens": null
     }
   },
   "travel_plan": {
-    "source": "Mumbai",
-    "destination": "South Korea",
-    "destination_type": "adventure",
+    "source": "Canada",
+    "destination": "UK",
+    "destination_type": "assets",
     "travel_dates": {
-      "start_date": null,
-      "end_date": null,
-      "flexible": true
+      "start_date": "2024-07-20",
+      "end_date": "2024-07-25",
+      "flexible": false
     },
     "transportation_mode": null
   },
   "budget": {
-    "budget_range": "four lakhs",
+    "budget_range": "ten thousand per person",
     "budget_type": null,
     "flexibility": null,
     "notes": null
   },
   "accommodation": {
-    "accommodation_type": "luxury hotels",
-    "hotel_rating": "five star or seven star",
-    "room_type": null,
+    "accommodation_type": "villa",
+    "hotel_rating": "five star",
+    "room_type": "multiple bedrooms",
     "preferences": {
       "breakfast_included": true,
-      "pool": true,
+      "pool": false,
       "spa": false,
-      "wifi": true,
-      "kids_friendly": true,
+      "wifi": false,
+      "kids_friendly": false,
       "near_attractions": false
     },
     "experience_expectation": null,
@@ -53,22 +53,17 @@
   },
   "activities": {
     "interest_profile": [
-      "parties",
-      "clubs"
+      "relaxation"
     ]
   },
   "food_preferences": {
-    "preference_type": "No Preference",
+    "preference_type": "Non-Vegetarian",
     "dietary_requirements": null,
     "special_notes": null
   },
   "support_services": {
     "required_services": [
-      "flight booking",
-      "airport transfer",
-      "visa assistance",
-      "travel insurance",
-      "hotel booking"
+      "tour guide"
     ],
     "special_assistance": {
       "senior_support": false,

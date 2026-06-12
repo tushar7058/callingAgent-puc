@@ -48,10 +48,10 @@ def _build_task_instructions(
 
 
 async def _start_task(session) -> None:
-    await session.generate_reply(
+    session.generate_reply(
         instructions=TASK_START_INSTRUCTIONS,
         allow_interruptions=True,
-        tool_choice="auto",
+        tool_choice="none",
     )
 
 

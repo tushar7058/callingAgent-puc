@@ -1,3 +1,4 @@
+from transformers.models.t5gemma.modeling_t5gemma import make_default_2d_attention_mask
 import os
 from dataclasses import dataclass
 
@@ -84,6 +85,12 @@ def build_stt(profile: LanguageProfile):
 
 def build_tts(profile: LanguageProfile):
     fallback_tts = [
+
+        cartesia.TTS(
+            model=os.getenv("CARTESIA_TTS_MODEL"),
+            language=profile.code,
+            voice=os.getenv("CARTESIA_TTS_VOICE"),
+        ),
         elevenlabs.TTS(
             model=os.getenv("ELEVENLABS_TTS_MODEL"),
             voice_id=ELEVENLABS_TTS_VOICE_ID,
