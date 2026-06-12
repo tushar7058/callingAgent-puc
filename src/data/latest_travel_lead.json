@@ -1,6 +1,6 @@
 {
   "communication_mode": "Agent",
-  "Dateandtime": "2026-06-11T17:32:58",
+  "Dateandtime": "2026-06-12T14:16:48",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
@@ -19,33 +19,33 @@
     }
   },
   "travel_plan": {
-    "source": "Mumbai",
-    "destination": "Doha",
-    "destination_type": "Business",
+    "source": "Canada",
+    "destination": "UK",
+    "destination_type": "assets",
     "travel_dates": {
-      "start_date": null,
-      "end_date": null,
-      "flexible": true
+      "start_date": "2024-07-20",
+      "end_date": "2024-07-25",
+      "flexible": false
     },
     "transportation_mode": null
   },
   "budget": {
-    "budget_range": "50000",
+    "budget_range": "ten thousand per person",
     "budget_type": null,
-    "flexibility": true,
+    "flexibility": null,
     "notes": null
   },
   "accommodation": {
-    "accommodation_type": null,
-    "hotel_rating": null,
-    "room_type": null,
+    "accommodation_type": "villa",
+    "hotel_rating": "five star",
+    "room_type": "multiple bedrooms",
     "preferences": {
-      "breakfast_included": null,
-      "pool": null,
-      "spa": null,
-      "wifi": null,
-      "kids_friendly": null,
-      "near_attractions": null
+      "breakfast_included": true,
+      "pool": false,
+      "spa": false,
+      "wifi": false,
+      "kids_friendly": false,
+      "near_attractions": false
     },
     "experience_expectation": null,
     "estimated_price": null,
@@ -53,11 +53,11 @@
   },
   "activities": {
     "interest_profile": [
-      "food"
+      "relaxation"
     ]
   },
   "food_preferences": {
-    "preference_type": "No Preference",
+    "preference_type": "Non-Vegetarian",
     "dietary_requirements": null,
     "special_notes": null
   },
@@ -66,8 +66,8 @@
       "tour guide"
     ],
     "special_assistance": {
-      "senior_support": null,
-      "kids_support": null,
+      "senior_support": false,
+      "kids_support": false,
       "accessibility": null
     }
   }

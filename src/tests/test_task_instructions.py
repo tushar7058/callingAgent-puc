@@ -6,7 +6,29 @@ from tasks.data_collection import (
     ActivityTask,
     CustomerInfoTask,
     TravelPlanTask,
+    _start_task,
 )
+
+
+class _SpeechHandle:
+    def __init__(self):
+        self.awaited = False
+
+    def __await__(self):
+        self.awaited = True
+        if False:
+            yield
+        return None
+
+
+class _SessionSpy:
+    def __init__(self):
+        self.calls = []
+        self.handle = _SpeechHandle()
+
+    def generate_reply(self, **kwargs):
+        self.calls.append(kwargs)
+        return self.handle
 
 
 async def test_data_collection_tasks_do_not_recommend_or_search_live_options():
@@ -83,6 +105,7 @@ async def test_task_transitions_start_immediately_and_advance_after_recording():
         "Start the current data collection task immediately" in TASK_START_INSTRUCTIONS
     )
     assert "ask exactly one clear question" in TASK_START_INSTRUCTIONS
+    assert "one short sentence" in TASK_START_INSTRUCTIONS
     assert "do not wait for the caller to ask what is next" in TASK_START_INSTRUCTIONS
 
 
@@ -91,3 +114,18 @@ async def test_customer_info_is_not_treated_as_initial_greeting_task():
 
     assert "The user has already been greeted" in instructions
     assert "Do not introduce yourself or say hello" in instructions
+
+
+async def test_task_start_schedules_speech_without_awaiting_playout():
+    session = _SessionSpy()
+
+    await _start_task(session)
+
+    assert session.calls == [
+        {
+            "instructions": TASK_START_INSTRUCTIONS,
+            "allow_interruptions": True,
+            "tool_choice": "none",
+        }
+    ]
+    assert session.handle.awaited is False

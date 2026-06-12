@@ -1,3 +1,4 @@
+from transformers.models.t5gemma.modeling_t5gemma import make_default_2d_attention_mask
 import os
 from dataclasses import dataclass
 
@@ -15,7 +16,9 @@ class LanguageProfile:
 
 
 DEFAULT_LANGUAGE_PROFILE = LanguageProfile(label="English", code="en-US")
-ELEVENLABS_TTS_VOICE_ID = os.getenv("ELEVENLABS_TTS_VOICE_ID")
+ELEVENLABS_TTS_VOICE_ID = os.getenv("ELEVENLABS_TTS_VOICE_ID") or os.getenv(
+    "ELEVELABS_TTS_VOICE_ID"
+)
 GOOGLE_TTS_VOICE_NAME = os.getenv("GOOGLE_TTS_VOICE_NAME")
 
 
@@ -48,6 +51,10 @@ def _is_english(profile: LanguageProfile) -> bool:
     return profile.code.lower().startswith("en")
 
 
+def _env_flag_enabled(name: str) -> bool:
+    return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def build_stt(profile: LanguageProfile):
     languages = [profile.code]
     if profile.code != DEFAULT_LANGUAGE_PROFILE.code:
@@ -78,12 +85,11 @@ def build_stt(profile: LanguageProfile):
 
 def build_tts(profile: LanguageProfile):
     fallback_tts = [
+
         cartesia.TTS(
             model=os.getenv("CARTESIA_TTS_MODEL"),
             language=profile.code,
             voice=os.getenv("CARTESIA_TTS_VOICE"),
-            speed=1.0,
-            emotion="Excited",
         ),
         elevenlabs.TTS(
             model=os.getenv("ELEVENLABS_TTS_MODEL"),
@@ -102,6 +108,16 @@ def build_tts(profile: LanguageProfile):
             voice=os.getenv("OPENAI_TTS_VOICE"),
         ),
     ]
+    if _env_flag_enabled("ENABLE_CARTESIA_TTS"):
+        fallback_tts.append(
+            cartesia.TTS(
+                model=os.getenv("CARTESIA_TTS_MODEL"),
+                language=profile.code,
+                voice=os.getenv("CARTESIA_TTS_VOICE"),
+                speed=1.0,
+                emotion="Excited",
+            )
+        )
     if _is_english(profile):
         fallback_tts.append(deepgram.TTS(model=os.getenv("DEEPGRAM_TTS_MODEL")))
 
