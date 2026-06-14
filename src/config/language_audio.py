@@ -84,7 +84,6 @@ def build_stt(profile: LanguageProfile):
 
 def build_tts(profile: LanguageProfile):
     fallback_tts = [
-
         cartesia.TTS(
             model=os.getenv("CARTESIA_TTS_MODEL"),
             language=profile.code,
