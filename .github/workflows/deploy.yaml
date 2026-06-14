@@ -77,9 +77,6 @@ jobs:
             exit 1
           fi
 
-          sudo mkdir -p "$DEPLOY_DIR/cache"
-          sudo chown -R 10001:10001 "$DEPLOY_DIR/cache"
-
           umask 077
           env_tmp="$(mktemp)"
           key_tmp="$(mktemp)"
@@ -98,7 +95,6 @@ jobs:
             --env-file "$DEPLOY_DIR/.env" \
             --env GOOGLE_APPLICATION_CREDENTIALS=/app/key.json \
             --volume "$DEPLOY_DIR/key.json:/app/key.json:ro" \
-            --volume "$DEPLOY_DIR/cache:/app/.cache" \
             "${IMAGE_NAME}:${GITHUB_SHA}"
 
           echo "Started container: ${CONTAINER_NAME}"
