@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1
 
 # Use the official Python image instead of the uv GHCR image so CI does not
 # depend on pulling from ghcr.io during Docker builds.
@@ -20,8 +20,7 @@ ENV XDG_CACHE_HOME=/app/.cache
 ENV HF_HOME=/app/.cache/huggingface
 
 # Install uv into the base image. Both build and runtime stages inherit this.
-RUN --mount=type=cache,target=/root/.cache/pip \
-  pip install uv
+RUN pip install --no-cache-dir uv
 
 # --- Build stage ---
 # Install dependencies, build native extensions, and prepare the application
@@ -32,13 +31,11 @@ FROM base AS build
 # g++: C++ compiler needed for building Python packages with C++ extensions
 # python3-dev: Python development headers needed for compilation
 # We clean up the apt cache after installation to keep the image size down
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-  --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-  rm -f /etc/apt/apt.conf.d/docker-clean && \
-  apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
-    python3-dev
+    python3-dev \
+  && rm -rf /var/lib/apt/lists/*
 
 # Create a new directory for our application code
 # And set it as the working directory
@@ -52,8 +49,7 @@ RUN mkdir -p src
 # --locked ensures we use exact versions from uv.lock for reproducible builds
 # This creates a virtual environment and installs all dependencies
 # Ensure your uv.lock file is checked in for consistency across environments
-RUN --mount=type=cache,target=/root/.cache/uv \
-  uv sync --locked --no-dev
+RUN uv sync --locked --no-dev
 
 # Copy all remaining application files into the container
 # This includes source code, configuration files, and dependency specifications
