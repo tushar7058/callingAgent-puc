@@ -1,4 +1,3 @@
-from transformers.models.t5gemma.modeling_t5gemma import make_default_2d_attention_mask
 import os
 from dataclasses import dataclass
 
