@@ -20,6 +20,10 @@ ENV HF_HOME=/app/.cache/huggingface
 ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 ENV HUGGINGFACE_HUB_CACHE=/app/.cache/huggingface
 
+# Google Cloud STT/TTS reads Application Default Credentials from this path.
+# The deploy workflow mounts the service account JSON here at runtime.
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
+
 # Install uv into the base image. Both build and runtime stages inherit this.
 RUN pip install --no-cache-dir uv
 
@@ -56,8 +60,6 @@ RUN uv sync --locked
 # This includes source code, configuration files, and dependency specifications
 # (Excludes files specified in .dockerignore)
 COPY . .
-
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
 
 # Pre-download any ML models or files the agent needs
 # This ensures the container is ready to run immediately without downloading
