@@ -17,6 +17,7 @@ env:
   IMAGE_NAME: livekit-agent
   CONTAINER_NAME: livekit-agent
   DEPLOY_DIR: ${{ vars.DEPLOY_DIR || '/opt/livekit-agent' }}
+  DOCKER_BUILDKIT: "1"
 
 jobs:
   ci-cd:
@@ -32,6 +33,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+          cache-dependency-glob: uv.lock
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -55,8 +57,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          sudo -n docker build \
-            --pull \
+          sudo -n env DOCKER_BUILDKIT=1 docker build \
             --tag "${IMAGE_NAME}:${GITHUB_SHA}" \
             --tag "${IMAGE_NAME}:latest" \
             .
