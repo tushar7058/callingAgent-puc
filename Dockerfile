@@ -1,99 +1,4 @@
-# # syntax=docker/dockerfile:1
-
-# # Use the official Python image instead of the uv GHCR image so CI does not
-# # depend on pulling from ghcr.io during Docker builds.
-# ARG PYTHON_VERSION=3.13
-# FROM python:${PYTHON_VERSION}-slim-bookworm AS base
-
-# # Keeps Python from buffering stdout and stderr to avoid situations where
-# # the application crashes without emitting any logs due to buffering.
-# ENV PYTHONUNBUFFERED=1
-
-# # Compile Python source to bytecode (.pyc) during install so the first import
-# # doesn't pay the compilation cost. This reduces agent cold-start time at the
-# # expense of a slightly longer build.
-# ENV UV_COMPILE_BYTECODE=1
-
-# # Keep runtime model downloads in a known location. The deployment workflow
-# # mounts this path as a persistent host cache so models are not baked into CI
-# # images and are reused across container restarts.
-# ENV XDG_CACHE_HOME=/app/.cache
-# ENV HF_HOME=/app/.cache/huggingface
-
-# # Install uv into the base image. Both build and runtime stages inherit this.
-# RUN pip install --no-cache-dir uv
-
-# # --- Build stage ---
-# # Install dependencies, build native extensions, and prepare the application
-# FROM base AS build
-
-# # Install build dependencies required for Python packages with native extensions
-# # gcc: C compiler needed for building Python packages with C extensions
-# # g++: C++ compiler needed for building Python packages with C++ extensions
-# # python3-dev: Python development headers needed for compilation
-# # We clean up the apt cache after installation to keep the image size down
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-#     gcc \
-#     g++ \
-#     python3-dev \
-#   && rm -rf /var/lib/apt/lists/*
-
-# # Create a new directory for our application code
-# # And set it as the working directory
-# WORKDIR /app
-
-# # Copy just the dependency files first, for more efficient layer caching
-# COPY pyproject.toml uv.lock ./
-# RUN mkdir -p src
-
-# # Install Python dependencies using UV's lock file
-# # --locked ensures we use exact versions from uv.lock for reproducible builds
-# # This creates a virtual environment and installs all dependencies
-# # Ensure your uv.lock file is checked in for consistency across environments
-# RUN uv sync --locked --no-dev
-
-# # Copy all remaining application files into the container
-# # This includes source code, configuration files, and dependency specifications
-# # (Excludes files specified in .dockerignore)
-# COPY . .
-
-# ENV GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
-
-# # --- Production stage ---
-# # Build tools (gcc, g++, python3-dev) are not included in the final image
-# FROM base
-
-# # Create a non-privileged user that the app will run under.
-# # See https://docs.docker.com/build/building/best-practices/#user
-# ARG UID=10001
-# RUN adduser \
-#     --disabled-password \
-#     --gecos "" \
-#     --home "/app" \
-#     --shell "/sbin/nologin" \
-#     --uid "${UID}" \
-#     appuser
-
-# # Copy the application and virtual environment with correct ownership in a single layer
-# # This avoids expensive recursive chown and excludes build tools from the final image
-# COPY --from=build --chown=appuser:appuser /app /app
-
-# WORKDIR /app
-
-# # Switch to the non-privileged user for all subsequent operations
-# # This improves security by not running as root
-# USER appuser
-
-# # Run the AgentServer using UV
-# # UV will activate the virtual environment and run the agent.
-# # The "start" command tells the AgentServer to connect to LiveKit and begin waiting for jobs.
-# CMD ["uv", "run", "--no-sync", "src/agent.py", "start"]
-
-
-
-
 # syntax=docker/dockerfile:1
-
 # Use the official Python image instead of the uv GHCR image so CI does not
 # depend on pulling from ghcr.io during Docker builds.
 ARG PYTHON_VERSION=3.13
@@ -112,6 +17,8 @@ ENV UV_COMPILE_BYTECODE=1
 # fetched during the build stage are copied into the final runtime image.
 ENV XDG_CACHE_HOME=/app/.cache
 ENV HF_HOME=/app/.cache/huggingface
+ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
+ENV HUGGINGFACE_HUB_CACHE=/app/.cache/huggingface
 
 # Install uv into the base image. Both build and runtime stages inherit this.
 RUN pip install --no-cache-dir uv
@@ -156,7 +63,10 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
 # This ensures the container is ready to run immediately without downloading
 # dependencies at runtime, which improves startup time and reliability
 # Pre-download any ML models or files the agent needs
-RUN python -m livekit.agents download-files
+# RUN uv run python -m livekit.agents download-files
+
+RUN uv run python -m livekit.agents download-files
+RUN chmod -R 755 /app/.cache
 
 # --- Production stage ---
 # Build tools (gcc, g++, python3-dev) are not included in the final image
