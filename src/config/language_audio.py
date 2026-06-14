@@ -50,10 +50,6 @@ def _is_english(profile: LanguageProfile) -> bool:
     return profile.code.lower().startswith("en")
 
 
-def _env_flag_enabled(name: str) -> bool:
-    return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
-
-
 def build_stt(profile: LanguageProfile):
     languages = [profile.code]
     if profile.code != DEFAULT_LANGUAGE_PROFILE.code:
@@ -106,16 +102,6 @@ def build_tts(profile: LanguageProfile):
             voice=os.getenv("OPENAI_TTS_VOICE"),
         ),
     ]
-    if _env_flag_enabled("ENABLE_CARTESIA_TTS"):
-        fallback_tts.append(
-            cartesia.TTS(
-                model=os.getenv("CARTESIA_TTS_MODEL"),
-                language=profile.code,
-                voice=os.getenv("CARTESIA_TTS_VOICE"),
-                speed=1.0,
-                emotion="Excited",
-            )
-        )
     if _is_english(profile):
         fallback_tts.append(deepgram.TTS(model=os.getenv("DEEPGRAM_TTS_MODEL")))
 
