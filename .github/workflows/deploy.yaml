@@ -17,7 +17,6 @@ env:
   IMAGE_NAME: livekit-agent
   CONTAINER_NAME: livekit-agent
   DEPLOY_DIR: ${{ vars.DEPLOY_DIR || '/opt/livekit-agent' }}
-  DOCKER_BUILDKIT: "1"
 
 jobs:
   ci-cd:
@@ -57,7 +56,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          sudo -n env DOCKER_BUILDKIT=1 docker build \
+          sudo -n docker build \
             --tag "${IMAGE_NAME}:${GITHUB_SHA}" \
             --tag "${IMAGE_NAME}:latest" \
             .
