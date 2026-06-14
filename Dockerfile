@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.7
 
 # Use the official Python image instead of the uv GHCR image so CI does not
 # depend on pulling from ghcr.io during Docker builds.
@@ -20,7 +20,8 @@ ENV XDG_CACHE_HOME=/app/.cache
 ENV HF_HOME=/app/.cache/huggingface
 
 # Install uv into the base image. Both build and runtime stages inherit this.
-RUN pip install --no-cache-dir uv
+RUN --mount=type=cache,target=/root/.cache/pip \
+  pip install uv
 
 # --- Build stage ---
 # Install dependencies, build native extensions, and prepare the application
@@ -31,11 +32,13 @@ FROM base AS build
 # g++: C++ compiler needed for building Python packages with C++ extensions
 # python3-dev: Python development headers needed for compilation
 # We clean up the apt cache after installation to keep the image size down
-RUN apt-get update && apt-get install -y \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+  rm -f /etc/apt/apt.conf.d/docker-clean && \
+  apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
-    python3-dev \
-  && rm -rf /var/lib/apt/lists/*
+    python3-dev
 
 # Create a new directory for our application code
 # And set it as the working directory
@@ -49,7 +52,8 @@ RUN mkdir -p src
 # --locked ensures we use exact versions from uv.lock for reproducible builds
 # This creates a virtual environment and installs all dependencies
 # Ensure your uv.lock file is checked in for consistency across environments
-RUN uv sync --locked
+RUN --mount=type=cache,target=/root/.cache/uv \
+  uv sync --locked --no-dev
 
 # Copy all remaining application files into the container
 # This includes source code, configuration files, and dependency specifications
@@ -61,7 +65,7 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
 # Pre-download any ML models or files the agent needs
 # This ensures the container is ready to run immediately without downloading
 # dependencies at runtime, which improves startup time and reliability
-RUN uv run "src/agent.py" download-files
+RUN uv run --no-sync "src/agent.py" download-files
 
 # --- Production stage ---
 # Build tools (gcc, g++, python3-dev) are not included in the final image
@@ -91,4 +95,4 @@ USER appuser
 # Run the AgentServer using UV
 # UV will activate the virtual environment and run the agent.
 # The "start" command tells the AgentServer to connect to LiveKit and begin waiting for jobs.
-CMD ["uv", "run", "src/agent.py", "start"]
+CMD ["uv", "run", "--no-sync", "src/agent.py", "start"]
