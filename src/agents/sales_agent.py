@@ -12,15 +12,17 @@ from livekit.agents.beta.tools import EndCallTool
 from livekit.agents.beta.workflows import TaskGroup
 
 from api.datasend import send_to_external_api
-from config.language_audio import build_stt, build_tts, resolve_language_profile
+from config.language_audio import (
+    DEFAULT_LANGUAGE_PROFILE,
+    build_stt,
+    build_tts,
+    resolve_language_profile,
+)
 from tasks.data_collection import (
     AccommodationTask,
-    ActivityTask,
     BudgetTask,
     CustomerInfoTask,
-    FoodPreferenceTask,
     LanguagePreferenceTask,
-    SupportServicesTask,
     TravelPlanTask,
 )
 from utils.helpers import _to_json_serializable, build_travel_lead_payload
@@ -28,6 +30,21 @@ from utils.helpers import _to_json_serializable, build_travel_lead_payload
 # logger = logging.getLogger("agent-Dakota-1462")
 # logger = logging.getLogger("Dakota-1462")
 logger = logging.getLogger("interview-agent")
+
+DATA_COLLECTION_TASK_IDS = (
+    "language_preference",
+    "customer_info",
+    "travel_plan",
+    "budget",
+    "accommodation",
+)
+SPEECH_LANGUAGE_CODE_KEY = "speech_language_code"
+
+
+def _should_update_speech_engines(userdata: dict, profile) -> bool:
+    current_code = userdata.get(SPEECH_LANGUAGE_CODE_KEY, DEFAULT_LANGUAGE_PROFILE.code)
+    userdata[SPEECH_LANGUAGE_CODE_KEY] = profile.code
+    return current_code != profile.code
 
 
 def _without_end_call_tools(tools):
@@ -60,6 +77,8 @@ You are interacting with a user via voice to collect travel lead information.
 # Conversational flow
 - Only collect the travel lead fields required by the current task.
 - Do not recommend flights, hotels, activities, prices, or itinerary ideas.
+- If the caller asks for anything outside travel lead collection, politely decline in one short sentence and return to the current travel question.
+- Do not answer general knowledge, coding, medical, legal, financial, or unrelated personal-assistant requests.
 - Sound human, attentive, and lightly enthusiastic. Use short acknowledgments like "Perfect," "Got it," or "That helps" before the next question.
 - Keep the pace natural and never interrogate the caller. Ask one clear question at a time.
 
@@ -140,13 +159,10 @@ You are interacting with a user via voice to collect travel lead information.
         )
 
         async def on_task_completed(task_event) -> None:
-            partial_results = get_job_context().proc.userdata.setdefault(
-                "dc_task_results", {}
-            )
+            userdata = get_job_context().proc.userdata
+            partial_results = userdata.setdefault("dc_task_results", {})
             partial_results[task_event.task_id] = task_event.result
-            get_job_context().proc.userdata["dc_results"] = build_travel_lead_payload(
-                partial_results
-            )
+            userdata["dc_results"] = build_travel_lead_payload(partial_results)
             logger.info(
                 "data collection task completed: task_id=%s collected_task_count=%s",
                 task_event.task_id,
@@ -158,8 +174,16 @@ You are interacting with a user via voice to collect travel lead information.
 
             preferred_language = getattr(task_event.result, "preferred_language", None)
             profile = resolve_language_profile(preferred_language)
-            get_job_context().proc.userdata["preferred_language"] = profile.label
-            get_job_context().proc.userdata["preferred_language_code"] = profile.code
+            userdata["preferred_language"] = profile.label
+            userdata["preferred_language_code"] = profile.code
+
+            if not _should_update_speech_engines(userdata, profile):
+                logger.info(
+                    "speech language unchanged; reusing speech pipelines: %s (%s)",
+                    profile.label,
+                    profile.code,
+                )
+                return
 
             # The public AgentSession API does not expose STT/TTS setters, so we
             # update the underlying engines after the language preference is known.
@@ -217,30 +241,6 @@ You are interacting with a user via voice to collect travel lead information.
             ),
             id="accommodation",
             description="Ask for accommodation preferences (5-star, 4-star, etc).",
-        )
-        # 5. Activities
-        task_group.add(
-            lambda _tools=_task_tools: ActivityTask(
-                agent_instructions=task_instructions(), extra_tools=_tools
-            ),
-            id="activities",
-            description="Collect the activity interest profile.",
-        )
-        # 6. Food Preferences
-        task_group.add(
-            lambda _tools=_task_tools: FoodPreferenceTask(
-                agent_instructions=task_instructions(), extra_tools=_tools
-            ),
-            id="food_preferences",
-            description="Collect food preferences and dietary requirements.",
-        )
-        # 7. Support Services
-        task_group.add(
-            lambda _tools=_task_tools: SupportServicesTask(
-                agent_instructions=task_instructions(), extra_tools=_tools
-            ),
-            id="support_services",
-            description="Collect required support services and special assistance needs.",
         )
 
         try:

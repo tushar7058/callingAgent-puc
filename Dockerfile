@@ -21,8 +21,8 @@ ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 ENV HUGGINGFACE_HUB_CACHE=/app/.cache/huggingface
 
 # Google Cloud STT/TTS reads Application Default Credentials from this path.
-# The deploy workflow mounts the service account JSON here at runtime.
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/key.json
+# LiveKit Cloud mounts file secrets at /etc/secrets/<filename> at runtime.
+ENV GOOGLE_APPLICATION_CREDENTIALS=/etc/secrets/key.json
 
 # Install uv into the base image. Both build and runtime stages inherit this.
 RUN pip install --no-cache-dir uv
