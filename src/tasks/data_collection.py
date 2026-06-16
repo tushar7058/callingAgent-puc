@@ -57,7 +57,7 @@ class CustomerInfoTask(AgentTask):
         super().__init__(
             instructions=_build_task_instructions(
                 agent_instructions,
-                "- Collect only the customer's full name and total travelers.\n- Capture traveler split only if the caller volunteers it: adults, kids, and senior citizens.\n- Do not ask for phone number or email address in this task. The phone number is available from the SIP call when present.\n- As soon as full name and total travelers are available, record them immediately.",
+                "Collect the customer’s full name, total travelers, email, and mobile number (confirm both, don’t rely on SIP); record immediately once obtained; capture traveler split (adults, kids, seniors) only if volunteered.",
                 first_question="May I have your full name and how many travelers will be going?",
             ),
             tools=list(extra_tools) if extra_tools else [],

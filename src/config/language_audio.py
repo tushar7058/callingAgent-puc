@@ -62,17 +62,17 @@ def build_stt(profile: LanguageProfile):
         languages.append(DEFAULT_LANGUAGE_PROFILE.code)
 
     providers = [
-        deepgram.STT(
-            model=os.getenv("DEEPGRAM_STT_MODEL"),
-            language=profile.code,
-            interim_results=True,
-            punctuate=True,
-        ),
         openai.STT(
             model=os.getenv("OPENAI_STT_MODEL"),
             language=profile.code,
             detect_language=True,
             use_realtime=True,
+        ),
+        deepgram.STT(
+            model=os.getenv("DEEPGRAM_STT_MODEL"),
+            language=profile.code,
+            interim_results=True,
+            punctuate=True,
         ),
     ]
     try:
@@ -101,13 +101,6 @@ def build_stt(profile: LanguageProfile):
 
 def build_tts(profile: LanguageProfile):
     fallback_tts = [
-        cartesia.TTS(
-            model=os.getenv("CARTESIA_TTS_MODEL"),
-            language=profile.code,
-            voice=os.getenv("CARTESIA_TTS_VOICE"),
-            speed=0.8,
-            emotion="Excited",
-        ),
         google.TTS(
             model_name=os.getenv("GOOGLE_TTS_MODEL"),
             gender="female",
@@ -115,15 +108,22 @@ def build_tts(profile: LanguageProfile):
             language=profile.code,
             use_streaming=True,
         ),
+        openai.TTS(
+            model=os.getenv("OPENAI_TTS_MODEL"),
+            voice=os.getenv("OPENAI_TTS_VOICE"),
+        ),
+        cartesia.TTS(
+            model=os.getenv("CARTESIA_TTS_MODEL"),
+            language=profile.code,
+            voice=os.getenv("CARTESIA_TTS_VOICE"),
+            speed=0.8,
+            emotion="Excited",
+        ),
         elevenlabs.TTS(
             model=os.getenv("ELEVENLABS_TTS_MODEL"),
             voice_id=ELEVENLABS_TTS_VOICE_ID,
             language=profile.code,
             auto_mode=True,
-        ),
-        openai.TTS(
-            model=os.getenv("OPENAI_TTS_MODEL"),
-            voice=os.getenv("OPENAI_TTS_VOICE"),
         ),
     ]
 
