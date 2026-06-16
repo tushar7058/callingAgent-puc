@@ -20,6 +20,7 @@ from config.language_audio import build_stt, build_tts, resolve_language_profile
 from utils.logging_config import setup_daily_file_logging
 from openai.types.beta.realtime.session import TurnDetection
 from config.language_audio import build_tts
+from livekit.plugins import google
 
 load_dotenv(".env")
 setup_daily_file_logging()
@@ -27,29 +28,29 @@ setup_daily_file_logging()
 logger = logging.getLogger("interview-agent")
 
 
-def build_llm():
-    return llm.FallbackAdapter(
-        [
-            openai.LLM(
-                model=os.getenv("OPENAI_MODEL"),
-                temperature=0,
-                max_completion_tokens=200,
-            ),
-            google.LLM(
-                model=os.getenv("GOOGLE_MODEL"),
-                vertexai=True,
-                credentials="key.json",
-                max_output_tokens=200,
-            ),
-            groq.LLM(
-                model=os.getenv("GROQ_MODEL"),
-                temperature=0,
-                api_key=os.getenv("GROQ_API_KEY"),
-                max_completion_tokens=200,
-            ),
-        ],
-        attempt_timeout=15.0,  # Gemini requires minimum 10s deadline; default 5s causes 400 errors
-    )
+# def build_llm():
+#     return llm.FallbackAdapter(
+#         [
+#             openai.LLM(
+#                 model=os.getenv("OPENAI_MODEL"),
+#                 temperature=0,
+#                 max_completion_tokens=200,
+#             ),
+#             google.LLM(
+#                 model=os.getenv("GOOGLE_MODEL"),
+#                 vertexai=True,
+#                 credentials="key.json",
+#                 max_output_tokens=200,
+#             ),
+#             groq.LLM(
+#                 model=os.getenv("GROQ_MODEL"),
+#                 temperature=0,
+#                 api_key=os.getenv("GROQ_API_KEY"),
+#                 max_completion_tokens=200,
+#             ),
+#         ],
+#         attempt_timeout=15.0,  # Gemini requires minimum 10s deadline; default 5s causes 400 errors
+#     )
 
 
 def prewarm(proc: JobProcess):
@@ -119,7 +120,13 @@ async def entrypoint(ctx: JobContext):
     default_profile = resolve_language_profile("English")
 
     session = AgentSession(
-        llm=openai.realtime.RealtimeModel(voice="marin"),
+        # llm=openai.realtime.RealtimeModel(voice="marin"),
+        llm = google.realtime.RealtimeModel(
+            voice="Sulafat",
+            temperature=0.8,
+            vertexai=True , 
+        ),
+        # tts=build_tts(default_profile),
         tts=build_tts(default_profile),
     )
     ctx.proc.userdata["dc_results"] = None

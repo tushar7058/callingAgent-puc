@@ -1,34 +1,34 @@
 {
   "communication_mode": "Agent",
-  "Dateandtime": "2026-06-16T22:25:47",
+  "Dateandtime": "2026-06-17T00:02:29",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
   },
   "customer_info": {
-    "full_name": "Aniket Patil",
+    "full_name": "Tushar Borude",
     "contact": {
-      "phone_number": "+917058949269",
-      "email_address": "aniketpatil123@gmail.com"
+      "phone_number": null,
+      "email_address": null
     },
     "travel_group": {
-      "total_travelers": 3,
-      "adults": 3,
+      "total_travelers": null,
+      "adults": null,
       "kids": null,
       "senior_citizens": null
     }
   },
   "travel_plan": {
     "source": "Mumbai",
-    "destination": "Canada",
-    "destination_type": "business trip",
-    "activities": false,
+    "destination": "Kolkata",
+    "destination_type": null,
+    "activities": null,
     "travel_dates": {
-      "start_date": "2026-07-30",
-      "end_date": "2026-08-01",
-      "flexible": true
+      "start_date": null,
+      "end_date": null,
+      "flexible": null
     },
-    "transportation_mode": "flight",
+    "transportation_mode": null,
     "special_assistance": {
       "senior_support": null,
       "kids_support": null,
@@ -36,11 +36,11 @@
     }
   },
   "budget": {
-    "budget_range": "50000",
-    "flexibility": false
+    "budget_range": "1000-1500",
+    "flexibility": true
   },
   "accommodation": {
-    "accommodation_type": "hotel",
-    "hotel_rating": "5 star"
+    "accommodation_type": null,
+    "hotel_rating": "3 star"
   }
 }
