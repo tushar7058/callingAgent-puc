@@ -101,6 +101,10 @@ def build_stt(profile: LanguageProfile):
 
 def build_tts(profile: LanguageProfile):
     fallback_tts = [
+        openai.TTS(
+            model=os.getenv("OPENAI_TTS_MODEL"),
+            voice=os.getenv("OPENAI_TTS_VOICE"),
+        ),
         google.TTS(
             model_name=os.getenv("GOOGLE_TTS_MODEL"),
             gender="female",
@@ -108,22 +112,19 @@ def build_tts(profile: LanguageProfile):
             language=profile.code,
             use_streaming=True,
         ),
-        openai.TTS(
-            model=os.getenv("OPENAI_TTS_MODEL"),
-            voice=os.getenv("OPENAI_TTS_VOICE"),
+        elevenlabs.TTS(
+            model=os.getenv("ELEVENLABS_TTS_MODEL"),
+            voice_id=ELEVENLABS_TTS_VOICE_ID,
+            language=profile.code,
+            auto_mode=True,
         ),
+
         cartesia.TTS(
             model=os.getenv("CARTESIA_TTS_MODEL"),
             language=profile.code,
             voice=os.getenv("CARTESIA_TTS_VOICE"),
             speed=0.8,
             emotion="Excited",
-        ),
-        elevenlabs.TTS(
-            model=os.getenv("ELEVENLABS_TTS_MODEL"),
-            voice_id=ELEVENLABS_TTS_VOICE_ID,
-            language=profile.code,
-            auto_mode=True,
         ),
     ]
 

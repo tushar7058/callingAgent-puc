@@ -1,34 +1,34 @@
 {
   "communication_mode": "Agent",
-  "Dateandtime": "2026-06-16T15:35:02",
+  "Dateandtime": "2026-06-16T22:25:47",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
   },
   "customer_info": {
-    "full_name": null,
+    "full_name": "Aniket Patil",
     "contact": {
-      "phone_number": null,
-      "email_address": null
+      "phone_number": "+917058949269",
+      "email_address": "aniketpatil123@gmail.com"
     },
     "travel_group": {
-      "total_travelers": null,
-      "adults": null,
+      "total_travelers": 3,
+      "adults": 3,
       "kids": null,
       "senior_citizens": null
     }
   },
   "travel_plan": {
-    "source": null,
-    "destination": null,
-    "destination_type": null,
-    "activities": null,
+    "source": "Mumbai",
+    "destination": "Canada",
+    "destination_type": "business trip",
+    "activities": false,
     "travel_dates": {
-      "start_date": null,
-      "end_date": null,
-      "flexible": null
+      "start_date": "2026-07-30",
+      "end_date": "2026-08-01",
+      "flexible": true
     },
-    "transportation_mode": null,
+    "transportation_mode": "flight",
     "special_assistance": {
       "senior_support": null,
       "kids_support": null,
@@ -36,11 +36,11 @@
     }
   },
   "budget": {
-    "budget_range": null,
-    "flexibility": null
+    "budget_range": "50000",
+    "flexibility": false
   },
   "accommodation": {
-    "accommodation_type": null,
-    "hotel_rating": null
+    "accommodation_type": "hotel",
+    "hotel_rating": "5 star"
   }
 }
