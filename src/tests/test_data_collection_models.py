@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from models.data_collection import (
     AccommodationPreferenceResults,
-    ActivityPreferenceResults,
     BudgetResults,
     CustomerInfoResults,
-    FoodPreferenceResults,
     LanguagePreferenceResults,
-    SupportServicesResults,
     TravelPlanResults,
 )
 from utils.helpers import build_travel_lead_payload
@@ -30,44 +27,22 @@ def test_build_travel_lead_payload_matches_external_contract():
                 source="Mumbai",
                 destination="Doha",
                 destination_type="City & Culture",
+                activities=True,
                 start_date="2026-06-10",
                 end_date="2026-06-15",
                 flexible=True,
                 transportation_mode="flight",
+                senior_support=False,
+                kids_support=True,
+                accessibility=None,
             ),
             "budget": BudgetResults(
-                budget_type="Premium",
+                budget_range="forty thousand",
                 flexibility=True,
-                notes="User is open to optimized pricing",
             ),
             "accommodation": AccommodationPreferenceResults(
                 accommodation_type="five star resort",
                 hotel_rating="5-star",
-                room_type="family room or multiple rooms",
-                breakfast_included=True,
-                pool=True,
-                spa=True,
-                wifi=True,
-                kids_friendly=True,
-                near_attractions=True,
-                experience_expectation="luxury + comfort + scenic stay",
-                notes="Live availability to be checked",
-            ),
-            "activities": ActivityPreferenceResults(
-                interest_profile=["sightseeing", "culture", "nature", "relaxation"],
-            ),
-            "food_preferences": FoodPreferenceResults(
-                preference_type="Mix of Both",
-            ),
-            "support_services": SupportServicesResults(
-                required_services=[
-                    "flight_booking",
-                    "airport_transfer",
-                    "visa_assistance",
-                    "travel_insurance",
-                ],
-                senior_support=False,
-                kids_support=True,
             ),
         },
         dateandtime="2026-06-10T12:34:56",
@@ -97,55 +72,26 @@ def test_build_travel_lead_payload_matches_external_contract():
             "source": "Mumbai",
             "destination": "Doha",
             "destination_type": "City & Culture",
+            "activities": True,
             "travel_dates": {
                 "start_date": "2026-06-10",
                 "end_date": "2026-06-15",
                 "flexible": True,
             },
             "transportation_mode": "flight",
-        },
-        "budget": {
-            "budget_range": None,
-            "budget_type": "Premium",
-            "flexibility": True,
-            "notes": "User is open to optimized pricing",
-        },
-        "accommodation": {
-            "accommodation_type": "five star resort",
-            "hotel_rating": "5-star",
-            "room_type": "family room or multiple rooms",
-            "preferences": {
-                "breakfast_included": True,
-                "pool": True,
-                "spa": True,
-                "wifi": True,
-                "kids_friendly": True,
-                "near_attractions": True,
-            },
-            "experience_expectation": "luxury + comfort + scenic stay",
-            "estimated_price": None,
-            "notes": "Live availability to be checked",
-        },
-        "activities": {
-            "interest_profile": ["sightseeing", "culture", "nature", "relaxation"],
-        },
-        "food_preferences": {
-            "preference_type": "Mix of Both",
-            "dietary_requirements": None,
-            "special_notes": None,
-        },
-        "support_services": {
-            "required_services": [
-                "flight_booking",
-                "airport_transfer",
-                "visa_assistance",
-                "travel_insurance",
-            ],
             "special_assistance": {
                 "senior_support": False,
                 "kids_support": True,
                 "accessibility": None,
             },
+        },
+        "budget": {
+            "budget_range": "forty thousand",
+            "flexibility": True,
+        },
+        "accommodation": {
+            "accommodation_type": "five star resort",
+            "hotel_rating": "5-star",
         },
     }
 
@@ -166,8 +112,8 @@ def test_build_travel_lead_payload_preserves_schema_for_partial_results():
     assert payload["customer_info"]["full_name"] == "Jane Doe"
     assert payload["customer_info"]["contact"]["phone_number"] == "12345"
     assert payload["travel_plan"]["source"] is None
-    assert payload["activities"]["interest_profile"] == []
-    assert payload["support_services"]["required_services"] == []
+    assert payload["travel_plan"]["activities"] is None
+    assert payload["travel_plan"]["special_assistance"]["accessibility"] is None
 
 
 def test_build_travel_lead_payload_localizes_arabic_language_label():

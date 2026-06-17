@@ -1,3 +1,118 @@
+# name: LiveKit Agent CI/CD
+
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+
+# concurrency:
+#   group: livekit-agent-${{ github.ref }}
+#   cancel-in-progress: true
+
+# permissions:
+#   contents: read
+
+# env:
+#   IMAGE_NAME: livekit-agent
+#   CONTAINER_NAME: livekit-agent
+#   DEPLOY_DIR: ${{ vars.DEPLOY_DIR || '/opt/livekit-agent' }}
+
+# jobs:
+#   ci-cd:
+#     name: Validate, Build, and Deploy
+#     runs-on: [self-hosted, Linux, X64]
+#     timeout-minutes: 45
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+
+#       - name: Install uv
+#         uses: astral-sh/setup-uv@v5
+#         with:
+#           enable-cache: true
+#           cache-dependency-glob: uv.lock
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.13"
+
+#       - name: Install dependencies
+#         run: uv sync --locked --dev
+
+#       - name: Check formatting
+#         run: uv run ruff format --check src
+
+#       - name: Run lint
+#         run: uv run ruff check src
+
+#       - name: Run tests
+#         run: uv run pytest
+
+#       - name: Verify Docker engine
+#         run: sudo -n docker info
+
+#       - name: Build Docker image
+#         run: |
+#           sudo -n docker build \
+#             --tag "${IMAGE_NAME}:${GITHUB_SHA}" \
+#             --tag "${IMAGE_NAME}:latest" \
+#             .
+
+#       - name: Deploy container
+#         if: github.event_name != 'pull_request'
+#         env:
+#           PRODUCTION_ENV_FILE: ${{ secrets.PRODUCTION_ENV_FILE }}
+#           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+#         run: |
+#           if [ -z "$PRODUCTION_ENV_FILE" ]; then
+#             echo "Missing required repository secret: PRODUCTION_ENV_FILE"
+#             exit 1
+#           fi
+
+#           if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
+#             echo "Missing required repository secret: GOOGLE_SERVICE_ACCOUNT_JSON"
+#             exit 1
+#           fi
+
+#           umask 077
+#           env_tmp="$(mktemp)"
+#           key_tmp="$(mktemp)"
+#           printf '%s\n' "$PRODUCTION_ENV_FILE" > "$env_tmp"
+#           printf '%s\n' "$GOOGLE_SERVICE_ACCOUNT_JSON" > "$key_tmp"
+
+#           sudo install -m 600 -o root -g root "$env_tmp" "$DEPLOY_DIR/.env"
+#           sudo install -m 400 -o 10001 -g 10001 "$key_tmp" "$DEPLOY_DIR/key.json"
+#           rm -f "$env_tmp" "$key_tmp"
+
+#           sudo -n docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+
+#           sudo -n docker run -d \
+#             --name "$CONTAINER_NAME" \
+#             --restart unless-stopped \
+#             --env-file "$DEPLOY_DIR/.env" \
+#             --env GOOGLE_APPLICATION_CREDENTIALS=/app/key.json \
+#             --volume "$DEPLOY_DIR/key.json:/app/key.json:ro" \
+#             "${IMAGE_NAME}:${GITHUB_SHA}"
+
+#           echo "Started container: ${CONTAINER_NAME}"
+#           sleep 5
+#           sudo -n docker ps -a --filter "name=${CONTAINER_NAME}"
+
+#           if [ "$(sudo -n docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME")" != "true" ]; then
+#             echo "Container ${CONTAINER_NAME} is not running. Last logs:"
+#             sudo -n docker logs --tail 200 "$CONTAINER_NAME" || true
+#             exit 1
+#           fi
+
+#       - name: Show deployment status
+#         if: github.event_name != 'pull_request'
+#         run: |
+#           sudo -n docker ps -a --filter "name=${CONTAINER_NAME}"
+#           sudo -n docker logs --tail 50 "$CONTAINER_NAME"
+
 name: LiveKit Agent CI/CD
 
 on:
@@ -19,40 +134,14 @@ env:
   DEPLOY_DIR: ${{ vars.DEPLOY_DIR || '/opt/livekit-agent' }}
 
 jobs:
-  ci-cd:
-    name: Validate, Build, and Deploy
+  build-and-deploy:
+    name: Build and Deploy
     runs-on: [self-hosted, Linux, X64]
-    timeout-minutes: 45
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-          cache-dependency-glob: uv.lock
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install dependencies
-        run: uv sync --locked --dev
-
-      - name: Check formatting
-        run: uv run ruff format --check src
-
-      - name: Run lint
-        run: uv run ruff check src
-
-      - name: Run tests
-        run: uv run pytest
-
-      - name: Verify Docker engine
-        run: sudo -n docker info
 
       - name: Build Docker image
         run: |
@@ -62,18 +151,17 @@ jobs:
             .
 
       - name: Deploy container
-        if: github.event_name != 'pull_request'
         env:
           PRODUCTION_ENV_FILE: ${{ secrets.PRODUCTION_ENV_FILE }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           if [ -z "$PRODUCTION_ENV_FILE" ]; then
-            echo "Missing required repository secret: PRODUCTION_ENV_FILE"
+            echo "Missing required secret: PRODUCTION_ENV_FILE"
             exit 1
           fi
 
           if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
-            echo "Missing required repository secret: GOOGLE_SERVICE_ACCOUNT_JSON"
+            echo "Missing required secret: GOOGLE_SERVICE_ACCOUNT_JSON"
             exit 1
           fi
 
@@ -97,18 +185,13 @@ jobs:
             --volume "$DEPLOY_DIR/key.json:/app/key.json:ro" \
             "${IMAGE_NAME}:${GITHUB_SHA}"
 
-          echo "Started container: ${CONTAINER_NAME}"
           sleep 5
-          sudo -n docker ps -a --filter "name=${CONTAINER_NAME}"
 
           if [ "$(sudo -n docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME")" != "true" ]; then
-            echo "Container ${CONTAINER_NAME} is not running. Last logs:"
+            echo "Container failed to start. Logs:"
             sudo -n docker logs --tail 200 "$CONTAINER_NAME" || true
             exit 1
           fi
 
-      - name: Show deployment status
-        if: github.event_name != 'pull_request'
-        run: |
-          sudo -n docker ps -a --filter "name=${CONTAINER_NAME}"
-          sudo -n docker logs --tail 50 "$CONTAINER_NAME"
+          echo "Deployed: ${CONTAINER_NAME}"
+          sudo -n docker ps --filter "name=${CONTAINER_NAME}"

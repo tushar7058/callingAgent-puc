@@ -3,7 +3,6 @@ from __future__ import annotations
 from tasks.data_collection import (
     TASK_START_INSTRUCTIONS,
     AccommodationTask,
-    ActivityTask,
     CustomerInfoTask,
     TravelPlanTask,
     _start_task,
@@ -35,7 +34,6 @@ async def test_data_collection_tasks_do_not_recommend_or_search_live_options():
     tasks = [
         TravelPlanTask(agent_instructions="base"),
         AccommodationTask(agent_instructions="base"),
-        ActivityTask(agent_instructions="base"),
     ]
 
     for task in tasks:
@@ -53,30 +51,26 @@ async def test_tasks_collect_target_schema_fields():
     assert (
         "transportation mode" in TravelPlanTask(agent_instructions="base").instructions
     )
+    travel_plan_instructions = TravelPlanTask(agent_instructions="base").instructions
+    assert "activities as yes or no" in travel_plan_instructions
+    assert "special assistance" in travel_plan_instructions
+    assert "senior support" in travel_plan_instructions
 
     accommodation_instructions = AccommodationTask(
         agent_instructions="base"
     ).instructions
-    assert "breakfast included" in accommodation_instructions
-    assert "kids friendly" in accommodation_instructions
-    assert "experience expectation" in accommodation_instructions
-
-    activity_instructions = ActivityTask(agent_instructions="base").instructions
-    assert "interest profile" in activity_instructions
+    assert "accommodation type" in accommodation_instructions
+    assert "hotel rating" in accommodation_instructions
+    assert "breakfast included" not in accommodation_instructions
+    assert "experience expectation" not in accommodation_instructions
 
 
-async def test_travel_plan_skips_transportation_mode_for_international_trips():
+async def test_travel_plan_offers_flight_only_for_international_trips():
     instructions = TravelPlanTask(agent_instructions="base").instructions
 
-    assert "Do not ask for transportation mode for international trips" in instructions
-    assert (
-        "leave transportation_mode empty unless the caller volunteers it"
-        in instructions
-    )
-    assert (
-        "Only ask transportation mode for domestic or same-country trips"
-        in instructions
-    )
+    assert "Ask for transportation mode" in instructions
+    assert "For international trips, offer only flight" in instructions
+    assert "Do not offer flight for domestic or same-country trips" in instructions
 
 
 async def test_tasks_instruct_model_to_record_values_in_selected_language():
@@ -109,11 +103,29 @@ async def test_task_transitions_start_immediately_and_advance_after_recording():
     assert "do not wait for the caller to ask what is next" in TASK_START_INSTRUCTIONS
 
 
+async def test_tasks_redirect_out_of_scope_requests_to_current_collection_task():
+    instructions = TravelPlanTask(agent_instructions="base").instructions
+
+    assert (
+        "If the user asks for anything outside travel lead collection" in instructions
+    )
+    assert "politely decline in one short sentence" in instructions
+    assert "return to the current question" in instructions
+
+
 async def test_customer_info_is_not_treated_as_initial_greeting_task():
     instructions = CustomerInfoTask(agent_instructions="base").instructions
 
     assert "The user has already been greeted" in instructions
     assert "Do not introduce yourself or say hello" in instructions
+
+
+async def test_customer_info_collects_only_name_and_traveler_count():
+    instructions = CustomerInfoTask(agent_instructions="base").instructions
+
+    assert "full name and total travelers" in instructions
+    assert "Do not ask for phone number or email address" in instructions
+    assert "record them immediately" in instructions
 
 
 async def test_task_start_schedules_speech_without_awaiting_playout():
