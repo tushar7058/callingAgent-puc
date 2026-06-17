@@ -120,13 +120,7 @@ async def entrypoint(ctx: JobContext):
     default_profile = resolve_language_profile("English")
 
     session = AgentSession(
-        # llm=openai.realtime.RealtimeModel(voice="marin"),
-        llm = google.realtime.RealtimeModel(
-            voice="Sulafat",
-            temperature=0.8,
-            vertexai=True , 
-        ),
-        # tts=build_tts(default_profile),
+        llm=openai.realtime.RealtimeModel(voice="marin"),
         tts=build_tts(default_profile),
     )
     ctx.proc.userdata["dc_results"] = None

@@ -27,8 +27,6 @@ from tasks.data_collection import (
 )
 from utils.helpers import _to_json_serializable, build_travel_lead_payload
 
-# logger = logging.getLogger("agent-Dakota-1462")
-# logger = logging.getLogger("Dakota-1462")
 logger = logging.getLogger("interview-agent")
 
 DATA_COLLECTION_TASK_IDS = (

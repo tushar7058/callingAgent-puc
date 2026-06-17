@@ -101,10 +101,10 @@ def build_stt(profile: LanguageProfile):
 
 def build_tts(profile: LanguageProfile):
     fallback_tts = [
-        # openai.TTS(
-        #     model=os.getenv("OPENAI_TTS_MODEL"),
-        #     voice=os.getenv("OPENAI_TTS_VOICE"),
-        # ),
+        openai.TTS(
+            model=os.getenv("OPENAI_TTS_MODEL"),
+            voice=os.getenv("OPENAI_TTS_VOICE"),           
+        ),
         google.TTS(
             model_name=os.getenv("GOOGLE_TTS_MODEL"),
             gender="female",
