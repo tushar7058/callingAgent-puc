@@ -14,8 +14,16 @@ def test_turn_handling_enables_preemptive_generation_for_lower_latency():
 
     assert options["preemptive_generation"] == {
         "enabled": True,
-        "preemptive_tts": False,
+        "preemptive_tts": True,
+        "max_speech_duration": 8.0,
+        "max_retries": 2,
     }
+
+
+def test_turn_handling_uses_vad_by_default_for_language_agnostic_calls():
+    options = build_turn_handling_options()
+
+    assert options["turn_detection"] == "vad"
 
 
 def test_turn_handling_uses_bilingual_safe_endpointing_and_auto_interruptions():
@@ -23,12 +31,12 @@ def test_turn_handling_uses_bilingual_safe_endpointing_and_auto_interruptions():
 
     assert options["endpointing"] == {
         "mode": "fixed",
-        "min_delay": 0.5,
-        "max_delay": 2.0,
+        "min_delay": 0.35,
+        "max_delay": 1.2,
     }
     assert options["interruption"] == {
         "resume_false_interruption": True,
-        "false_interruption_timeout": 1.5,
+        "false_interruption_timeout": 0.8,
     }
     assert "mode" not in options["interruption"]
     assert "min_words" not in options["interruption"]

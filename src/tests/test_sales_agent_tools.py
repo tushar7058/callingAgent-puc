@@ -3,7 +3,14 @@ from __future__ import annotations
 import asyncio
 from types import SimpleNamespace
 
-from agents.sales_agent import DefaultAgent, _without_end_call_tools
+from agents.sales_agent import (
+    DATA_COLLECTION_TASK_IDS,
+    SPEECH_LANGUAGE_CODE_KEY,
+    DefaultAgent,
+    _should_update_speech_engines,
+    _without_end_call_tools,
+)
+from config.language_audio import LanguageProfile
 from models.data_collection import CustomerInfoResults
 
 
@@ -66,6 +73,50 @@ def test_default_agent_forces_short_voice_responses():
 
     assert "maximum one short sentence" in instructions
     assert "Ask one question at a time" in instructions
+
+
+def test_default_agent_has_out_of_scope_guardrails():
+    instructions = DefaultAgent()._agent_instructions
+
+    assert (
+        "If the caller asks for anything outside travel lead collection" in instructions
+    )
+    assert "politely decline" in instructions
+    assert "return to the current travel question" in instructions
+
+
+def test_default_agent_uses_short_data_collection_flow():
+    assert DATA_COLLECTION_TASK_IDS == (
+        "language_preference",
+        "customer_info",
+        "travel_plan",
+        "budget",
+        "accommodation",
+    )
+
+
+def test_speech_engines_are_reused_when_language_is_unchanged():
+    userdata = {}
+
+    should_update = _should_update_speech_engines(
+        userdata,
+        LanguageProfile(label="English", code="en-US"),
+    )
+
+    assert should_update is False
+    assert userdata[SPEECH_LANGUAGE_CODE_KEY] == "en-US"
+
+
+def test_speech_engines_update_when_language_changes():
+    userdata = {SPEECH_LANGUAGE_CODE_KEY: "en-US"}
+
+    should_update = _should_update_speech_engines(
+        userdata,
+        LanguageProfile(label="Arabic", code="ar"),
+    )
+
+    assert should_update is True
+    assert userdata[SPEECH_LANGUAGE_CODE_KEY] == "ar"
 
 
 def test_task_agent_instructions_do_not_duplicate_base_prompt():

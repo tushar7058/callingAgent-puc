@@ -130,6 +130,35 @@ lk agent create
 
 See the [deploying to production](https://docs.livekit.io/deploy/agents/) guide for detailed instructions and optimization tips.
 
+### Google credentials for STT/TTS fallback
+
+Do not copy `key.json` into the Docker image. LiveKit Cloud supports file-mounted
+secrets and mounts them under `/etc/secrets/<filename>` at runtime. This project
+sets `GOOGLE_APPLICATION_CREDENTIALS=/etc/secrets/key.json` in the Dockerfile.
+
+For an existing LiveKit Cloud agent, mount the local service account file and set
+the matching environment variable:
+
+```console
+./scripts/mount_google_credentials.sh ./key.json
+```
+
+You can also pass the same secret mount when deploying a new image:
+
+```console
+lk agent deploy \
+  --secret-mount ./key.json \
+  --secrets "GOOGLE_APPLICATION_CREDENTIALS=/etc/secrets/key.json"
+```
+
+For local Docker runs, mount the file read-only at the same path:
+
+```console
+docker run --rm \
+  -v "$PWD/key.json:/etc/secrets/key.json:ro" \
+  your-agent-image
+```
+
 ## Join the LiveKit community
 
 Join the [LiveKit Slack Community](https://livekit.io/join-slack) to get help from the LiveKit team and other developers.

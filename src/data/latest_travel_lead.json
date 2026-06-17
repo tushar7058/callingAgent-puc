@@ -1,74 +1,46 @@
 {
   "communication_mode": "Agent",
-  "Dateandtime": "2026-06-12T14:16:48",
+  "Dateandtime": "2026-06-17T00:02:29",
   "language_preference": {
     "preferred_language": "English",
     "language_code": "en-US"
   },
   "customer_info": {
-    "full_name": "Alex",
+    "full_name": "Tushar Borude",
     "contact": {
-      "phone_number": "7058949269",
-      "email_address": "alex123@gmail.com"
+      "phone_number": null,
+      "email_address": null
     },
     "travel_group": {
-      "total_travelers": 3,
+      "total_travelers": null,
       "adults": null,
       "kids": null,
       "senior_citizens": null
     }
   },
   "travel_plan": {
-    "source": "Canada",
-    "destination": "UK",
-    "destination_type": "assets",
+    "source": "Mumbai",
+    "destination": "Kolkata",
+    "destination_type": null,
+    "activities": null,
     "travel_dates": {
-      "start_date": "2024-07-20",
-      "end_date": "2024-07-25",
-      "flexible": false
+      "start_date": null,
+      "end_date": null,
+      "flexible": null
     },
-    "transportation_mode": null
-  },
-  "budget": {
-    "budget_range": "ten thousand per person",
-    "budget_type": null,
-    "flexibility": null,
-    "notes": null
-  },
-  "accommodation": {
-    "accommodation_type": "villa",
-    "hotel_rating": "five star",
-    "room_type": "multiple bedrooms",
-    "preferences": {
-      "breakfast_included": true,
-      "pool": false,
-      "spa": false,
-      "wifi": false,
-      "kids_friendly": false,
-      "near_attractions": false
-    },
-    "experience_expectation": null,
-    "estimated_price": null,
-    "notes": null
-  },
-  "activities": {
-    "interest_profile": [
-      "relaxation"
-    ]
-  },
-  "food_preferences": {
-    "preference_type": "Non-Vegetarian",
-    "dietary_requirements": null,
-    "special_notes": null
-  },
-  "support_services": {
-    "required_services": [
-      "tour guide"
-    ],
+    "transportation_mode": null,
     "special_assistance": {
-      "senior_support": false,
-      "kids_support": false,
+      "senior_support": null,
+      "kids_support": null,
       "accessibility": null
     }
+  },
+  "budget": {
+    "budget_range": "1000-1500",
+    "flexibility": true
+  },
+  "accommodation": {
+    "accommodation_type": null,
+    "hotel_rating": "3 star"
   }
 }
