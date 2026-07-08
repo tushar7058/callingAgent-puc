@@ -5,6 +5,7 @@ from models.data_collection import (
     AccommodationPreferenceResults,
     BudgetResults,
     CustomerInfoResults,
+    GreetingResults,
     LanguagePreferenceResults,
     TravelPlanResults,
 )
@@ -23,20 +24,13 @@ def _build_task_instructions(
     task_instructions: str,
     *,
     first_question: str,
-    is_first: bool = False,
 ):
-    prefix = (
-        ""
-        if is_first
-        else "The user has already been greeted. Do not introduce yourself or say hello. Directly ask for the required information.\n"
-    )
     first_question_instruction = (
         f"\nWhen this task starts, ask exactly one question to begin: {first_question}"
     )
-    suffix = "\nIMPORTANT: Do NOT search live availability, recommend options, give prices, provide travel advice, say goodbye, recap the full conversation, or tell the user you are done. Only collect the information for THIS specific task. If the user asks for anything outside travel lead collection, politely decline in one short sentence and return to the current question. As soon as all required details for this task are available, silently record them with the appropriate tool so the TaskGroup can immediately continue to the next task. If the information was already provided earlier in the conversation, confirm it briefly and then record it immediately using the appropriate tool."
+    suffix = "\nIMPORTANT: Only collect the information for THIS specific task. As soon as all required details for this task are available, silently record them with the appropriate tool so the TaskGroup can immediately continue to the next task. If the information was already provided earlier in the conversation, confirm it briefly and then record it immediately using the appropriate tool."
     return (
-        prefix
-        + agent_instructions
+        agent_instructions
         + "\n"
         + task_instructions
         + first_question_instruction
@@ -52,12 +46,32 @@ async def _start_task(session) -> None:
     )
 
 
+class GreetingTask(AgentTask):
+    def __init__(self, agent_instructions: str, extra_tools: list | None = None):
+        super().__init__(
+            instructions=agent_instructions + "\n" + "Welcome the caller bilingually. First say 'Welcome to Mannai Travels! I am AIRA, your AI travel assistant.' Then immediately say the Arabic equivalent (e.g., 'أهلاً بك في سفريات المناعي! أنا آيرا، مساعدك الذكي للسفر.'). IMPORTANT: The greeting must be a statement only. Do NOT end with any question. Once you have greeted the user, immediately call the tool to finish the greeting.",
+            tools=list(extra_tools) if extra_tools else [],
+        )
+
+    async def on_enter(self):
+        self.session.generate_reply(
+            instructions="Start the conversation by greeting the user as instructed. Do not wait for them to speak first.",
+            allow_interruptions=True,
+            tool_choice="none",
+        )
+
+    @function_tool(name="finish_greeting")
+    async def finish_greeting(self, context: RunContext):
+        """Call this tool immediately after you have successfully greeted the user bilingually."""
+        self.complete(GreetingResults())
+
+
 class CustomerInfoTask(AgentTask):
     def __init__(self, agent_instructions: str, extra_tools: list | None = None):
         super().__init__(
             instructions=_build_task_instructions(
                 agent_instructions,
-                "Collect the customer’s full name, total travelers, email, and mobile number (confirm both, don’t rely on SIP); record immediately once obtained; capture traveler split (adults, kids, seniors) only if volunteered.",
+                "You must collect four mandatory fields: the customer’s full name, total travelers, email address, and mobile number. Ask for these fields if they are not provided. Do NOT call the record tool until you have collected all four fields. Confirm the phone number with the user, don't rely on SIP. You may capture traveler split (adults, kids, seniors) only if volunteered.",
                 first_question="May I have your full name and how many travelers will be going?",
             ),
             tools=list(extra_tools) if extra_tools else [],
@@ -71,9 +85,9 @@ class CustomerInfoTask(AgentTask):
         self,
         context: RunContext,
         full_name: str,
-        phone_number: str | None = None,
-        email_address: str | None = None,
-        total_travelers: int | None = None,
+        phone_number: str,
+        email_address: str,
+        total_travelers: int,
         adults: int | None = None,
         kids: int | None = None,
         senior_citizens: int | None = None,
@@ -104,7 +118,6 @@ class LanguagePreferenceTask(AgentTask):
             instructions=_build_task_instructions(
                 agent_instructions,
                 "- Ask which language the customer prefers for the conversation.\n- Offer only two options: English or Arabic.\n- IMPORTANT: Ask this question bilingually in both English and Arabic (e.g., 'Would you prefer to continue in English, or Arabic? هل تفضل الاستمرار باللغة الإنجليزية أم العربية؟').\n- Record the exact chosen option using the tool.",
-                is_first=False,
                 first_question="Would you prefer to continue in English, or Arabic? هل تفضل الاستمرار باللغة الإنجليزية أم العربية؟",
             ),
             tools=list(extra_tools) if extra_tools else [],

@@ -2,6 +2,11 @@ from dataclasses import dataclass
 
 
 @dataclass
+class GreetingResults:
+    pass
+
+
+@dataclass
 class CustomerInfoResults:
     full_name: str
     phone_number: str | None = None

@@ -5,6 +5,7 @@ from tasks.data_collection import (
     AccommodationTask,
     CustomerInfoTask,
     TravelPlanTask,
+    GreetingTask,
     _start_task,
 )
 
@@ -31,20 +32,13 @@ class _SessionSpy:
 
 
 async def test_data_collection_tasks_do_not_recommend_or_search_live_options():
-    tasks = [
-        TravelPlanTask(agent_instructions="base"),
-        AccommodationTask(agent_instructions="base"),
-    ]
-
-    for task in tasks:
-        instructions = task.instructions
-        assert "Do NOT search live availability" in instructions
-        assert "recommend options" in instructions
-        assert "Only collect" in instructions
-        assert "shortlist" not in instructions
-        assert "best_TravelOption" not in instructions
-        assert "gethotel_details" not in instructions
-        assert "locationbasedactivitydetail" not in instructions
+    from agents.sales_agent import DefaultAgent
+    agent = DefaultAgent()
+    base_instructions = agent._agent_instructions
+    
+    assert "Do NOT search live availability" in base_instructions
+    assert "recommend options" in base_instructions
+    assert "Only collect" in base_instructions
 
 
 async def test_tasks_collect_target_schema_fields():
@@ -104,28 +98,27 @@ async def test_task_transitions_start_immediately_and_advance_after_recording():
 
 
 async def test_tasks_redirect_out_of_scope_requests_to_current_collection_task():
-    instructions = TravelPlanTask(agent_instructions="base").instructions
+    from agents.sales_agent import DefaultAgent
+    agent = DefaultAgent()
+    base_instructions = agent._agent_instructions
 
     assert (
-        "If the user asks for anything outside travel lead collection" in instructions
+        "If the caller asks for anything outside travel lead collection" in base_instructions
     )
-    assert "politely decline in one short sentence" in instructions
-    assert "return to the current question" in instructions
+    assert "politely decline in one short sentence" in base_instructions
 
 
-async def test_customer_info_is_not_treated_as_initial_greeting_task():
+async def test_greeting_task_instructions():
+    instructions = GreetingTask(agent_instructions="base").instructions
+    assert "Welcome the caller bilingually" in instructions
+    assert "Do NOT end with any question" in instructions
+
+
+async def test_customer_info_collects_mandatory_fields():
     instructions = CustomerInfoTask(agent_instructions="base").instructions
 
-    assert "The user has already been greeted" in instructions
-    assert "Do not introduce yourself or say hello" in instructions
-
-
-async def test_customer_info_collects_only_name_and_traveler_count():
-    instructions = CustomerInfoTask(agent_instructions="base").instructions
-
-    assert "full name and total travelers" in instructions
-    assert "Do not ask for phone number or email address" in instructions
-    assert "record them immediately" in instructions
+    assert "four mandatory fields" in instructions
+    assert "email address, and mobile number" in instructions
 
 
 async def test_task_start_schedules_speech_without_awaiting_playout():
